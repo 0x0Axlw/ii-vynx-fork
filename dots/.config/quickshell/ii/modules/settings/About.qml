@@ -282,7 +282,7 @@ ContentPage {
                     materialIcon: actionProc.running && actionProc.mode === "fork" ? "sync" : "fork_right"
                     mainText: actionProc.running && actionProc.mode === "fork"
                         ? Translation.tr("Switching...")
-                        : Translation.tr("My Fork")
+                        : Translation.tr("P3DROVFX Fork")
                     enabled: !actionProc.running
                     onClicked: {
                         actionProc.logOutput = ""

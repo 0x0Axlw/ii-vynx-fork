@@ -27,13 +27,11 @@ ContentPage {
                     Config.options.cheatsheet.superKey = newValue;
                 }
                 // Use a nerdfont to see the icons
-                options: ([
-                  "󰖳", "", "󰨡", "", "󰌽", "󰣇", "", "", "", 
-                  "", "", "󱄛", "", "", "", "⌘", "󰀲", "󰟍", ""
-                ]).map(icon => { return {
-                  displayName: icon,
-                  value: icon
-                  }
+                options: (["󰖳", "", "󰨡", "", "󰌽", "󰣇", "", "", "", "", "", "󱄛", "", "", "", "⌘", "󰀲", "󰟍", ""]).map(icon => {
+                    return {
+                        displayName: icon,
+                        value: icon
+                    };
                 })
             }
         }
@@ -58,7 +56,7 @@ ContentPage {
                 Config.options.cheatsheet.useFnSymbol = checked;
             }
             StyledToolTip {
-              text: Translation.tr("e.g. 󱊫 for F1, 󱊶  for F12")
+                text: Translation.tr("e.g. 󱊫 for F1, 󱊶  for F12")
             }
         }
         ConfigSwitch {
@@ -69,7 +67,7 @@ ContentPage {
                 Config.options.cheatsheet.useMouseSymbol = checked;
             }
             StyledToolTip {
-              text: Translation.tr("Replace 󱕐   for \"Scroll ↓\", 󱕑   \"Scroll ↑\", L󰍽   \"LMB\", R󰍽   \"RMB\", 󱕒   \"Scroll ↑/↓\" and ⇞/⇟ for \"Page_↑/↓\"")
+                text: Translation.tr("Replace 󱕐   for \"Scroll ↓\", 󱕑   \"Scroll ↑\", L󰍽   \"LMB\", R󰍽   \"RMB\", 󱕒   \"Scroll ↑/↓\" and ⇞/⇟ for \"Page_↑/↓\"")
             }
         }
         ConfigSwitch {
@@ -82,7 +80,6 @@ ContentPage {
             StyledToolTip {
                 text: Translation.tr("Display modifiers and keys in multiple keycap (e.g., \"Ctrl + A\" instead of \"Ctrl A\" or \"󰘴 + A\" instead of \"󰘴 A\")")
             }
-
         }
 
         ConfigSpinBox {
@@ -153,7 +150,7 @@ ContentPage {
             }
         }
     }
-    
+
     ContentSection {
         icon: "opacity"
         title: Translation.tr("Transparency")
@@ -219,21 +216,27 @@ ContentPage {
             buttonIcon: "check"
             text: Translation.tr("Enable")
             checked: Config.options.dock.enable
-            onCheckedChanged: { Config.options.dock.enable = checked; }
+            onCheckedChanged: {
+                Config.options.dock.enable = checked;
+            }
         }
 
         ConfigSwitch {
             buttonIcon: "desktop_windows"
             text: Translation.tr("Isolate monitors")
             checked: Config.options.dock.isolateMonitors ?? false
-            onCheckedChanged: { Config.options.dock.isolateMonitors = checked; }
+            onCheckedChanged: {
+                Config.options.dock.isolateMonitors = checked;
+            }
         }
 
         ConfigSwitch {
             buttonIcon: "ad"
             text: Translation.tr("Enable windows preview")
             checked: Config.options.dock.enablePreview
-            onCheckedChanged: { Config.options.dock.enablePreview = checked; }
+            onCheckedChanged: {
+                Config.options.dock.enablePreview = checked;
+            }
         }
 
         ConfigRow {
@@ -242,13 +245,17 @@ ContentPage {
                 buttonIcon: "highlight_mouse_cursor"
                 text: Translation.tr("Hover to reveal")
                 checked: Config.options.dock.hoverToReveal
-                onCheckedChanged: { Config.options.dock.hoverToReveal = checked; }
+                onCheckedChanged: {
+                    Config.options.dock.hoverToReveal = checked;
+                }
             }
             ConfigSwitch {
                 buttonIcon: "keep"
                 text: Translation.tr("Pinned on startup")
                 checked: Config.options.dock.pinnedOnStartup
-                onCheckedChanged: { Config.options.dock.pinnedOnStartup = checked; }
+                onCheckedChanged: {
+                    Config.options.dock.pinnedOnStartup = checked;
+                }
             }
         }
 
@@ -258,14 +265,18 @@ ContentPage {
                 buttonIcon: "colors"
                 text: Translation.tr("Tint app icons")
                 checked: Config.options.dock.monochromeIcons
-                onCheckedChanged: { Config.options.dock.monochromeIcons = checked; }
+                onCheckedChanged: {
+                    Config.options.dock.monochromeIcons = checked;
+                }
             }
             ConfigSwitch {
                 buttonIcon: "contrast"
                 text: Translation.tr("Dim inactive app icons")
                 enabled: !Config.options.dock.monochromeIcons
                 checked: Config.options.dock.dimInactiveIcons
-                onCheckedChanged: { Config.options.dock.dimInactiveIcons = checked; }
+                onCheckedChanged: {
+                    Config.options.dock.dimInactiveIcons = checked;
+                }
                 StyledToolTip {
                     text: Translation.tr("Greyscale icons for pinned apps that are not running.\nDisabled when 'Tint app icons' is active.")
                 }
@@ -276,7 +287,9 @@ ContentPage {
             buttonIcon: "play_pause"
             text: Translation.tr("Enable media widget")
             checked: Config.options.dock.enableMediaWidget
-            onCheckedChanged: { Config.options.dock.enableMediaWidget = checked; }
+            onCheckedChanged: {
+                Config.options.dock.enableMediaWidget = checked;
+            }
         }
 
         ConfigSpinBox {
@@ -286,9 +299,11 @@ ContentPage {
             from: 40
             to: 80
             stepSize: 1
-            onValueChanged: { Config.options.dock.height = value; }
+            onValueChanged: {
+                Config.options.dock.height = value;
+            }
         }
-        
+
         ConfigRow {
             ContentSubsection {
                 title: Translation.tr("Dock position")
@@ -298,11 +313,31 @@ ContentPage {
                         Config.options.dock.position = newValue;
                     }
                     options: [
-                        { displayName: Translation.tr("Auto"), icon: "expand", value: "auto" },
-                        { displayName: Translation.tr("Bottom"), icon: "vertical_align_bottom", value: "bottom" },
-                        { displayName: Translation.tr("Top"), icon: "vertical_align_top", value: "top" },
-                        { displayName: Translation.tr("Left"), icon: "keyboard_tab_rtl", value: "left" },
-                        { displayName: Translation.tr("Right"), icon: "keyboard_tab", value: "right" }
+                        {
+                            displayName: Translation.tr("Auto"),
+                            icon: "expand",
+                            value: "auto"
+                        },
+                        {
+                            displayName: Translation.tr("Bottom"),
+                            icon: "vertical_align_bottom",
+                            value: "bottom"
+                        },
+                        {
+                            displayName: Translation.tr("Top"),
+                            icon: "vertical_align_top",
+                            value: "top"
+                        },
+                        {
+                            displayName: Translation.tr("Left"),
+                            icon: "keyboard_tab_rtl",
+                            value: "left"
+                        },
+                        {
+                            displayName: Translation.tr("Right"),
+                            icon: "keyboard_tab",
+                            value: "right"
+                        }
                     ]
                 }
             }
@@ -320,7 +355,7 @@ ContentPage {
             onCheckedChanged: {
                 Config.options.sidebar.ai.showProviderAndModelButtons = checked;
             }
-        }    
+        }
     }
 
     ContentSection {
@@ -550,14 +585,13 @@ ContentPage {
                     Config.options.overlay.notes.allowEditingIcon = checked;
                 }
             }
-            
         }
     }
 
     ContentSection {
         icon: "music_note"
         title: Translation.tr("Overlay: Media")
-    
+
         ConfigSwitch {
             buttonIcon: "sliders"
             text: Translation.tr("Show slider")
@@ -603,7 +637,6 @@ ContentPage {
                 }
             }
         }
-
     }
 
     ContentSection {
@@ -651,18 +684,26 @@ ContentPage {
                 }
             }
         }
-        
+
         ContentSubsection {
             title: Translation.tr("Google Lens")
-            
+
             ConfigSelectionArray {
                 currentValue: Config.options.search.imageSearch.useCircleSelection ? "circle" : "rectangles"
                 onSelected: newValue => {
                     Config.options.search.imageSearch.useCircleSelection = (newValue === "circle");
                 }
                 options: [
-                    { icon: "activity_zone", value: "rectangles", displayName: Translation.tr("Rectangular selection") },
-                    { icon: "gesture", value: "circle", displayName: Translation.tr("Circle to Search") }
+                    {
+                        icon: "activity_zone",
+                        value: "rectangles",
+                        displayName: Translation.tr("Rectangular selection")
+                    },
+                    {
+                        icon: "gesture",
+                        value: "circle",
+                        displayName: Translation.tr("Circle to Search")
+                    }
                 ]
             }
         }
@@ -682,7 +723,7 @@ ContentPage {
 
         ContentSubsection {
             title: Translation.tr("Circle selection")
-            
+
             ConfigSpinBox {
                 icon: "eraser_size_3"
                 text: Translation.tr("Stroke width")
@@ -762,7 +803,7 @@ ContentPage {
 
         ContentSubsection {
             title: Translation.tr("Quick toggles")
-            
+
             ConfigSelectionArray {
                 Layout.fillWidth: false
                 currentValue: Config.options.sidebar.quickToggles.style
@@ -808,7 +849,7 @@ ContentPage {
                     Config.options.sidebar.quickSliders.enable = checked;
                 }
             }
-            
+
             ConfigSwitch {
                 buttonIcon: "brightness_6"
                 text: Translation.tr("Brightness")
@@ -901,7 +942,7 @@ ContentPage {
                     }
                 }
             }
-            
+
             ConfigRow {
                 uniform: true
                 ConfigSwitch {
@@ -995,7 +1036,7 @@ ContentPage {
                 }
             }
         }
-        
+
         ConfigRow {
             uniform: true
             ConfigSwitch {
@@ -1016,7 +1057,7 @@ ContentPage {
                 }
             }
         }
-        
+
         ConfigSwitch {
             buttonIcon: "grid_3x3"
             text: Translation.tr("Use workspace map")
@@ -1061,7 +1102,7 @@ ContentPage {
                 enabled: Config.options.overview.showOpeningAnimation
                 currentValue: Config.options.overview.scrollingStyle.zoomStyle
                 onSelected: newValue => {
-                    Config.options.overview.scrollingStyle.zoomStyle = newValue
+                    Config.options.overview.scrollingStyle.zoomStyle = newValue;
                 }
                 options: [
                     {
@@ -1077,7 +1118,7 @@ ContentPage {
                 ]
             }
         }
-        
+
         ContentSubsection {
             title: Translation.tr("Classic overview style")
             ConfigRow {
@@ -1111,7 +1152,7 @@ ContentPage {
                 ConfigSelectionArray {
                     currentValue: Config.options.overview.orderRightLeft
                     onSelected: newValue => {
-                        Config.options.overview.orderRightLeft = newValue
+                        Config.options.overview.orderRightLeft = newValue;
                     }
                     options: [
                         {
@@ -1130,7 +1171,7 @@ ContentPage {
                     Layout.leftMargin: 50
                     currentValue: Config.options.overview.orderBottomUp
                     onSelected: newValue => {
-                        Config.options.overview.orderBottomUp = newValue
+                        Config.options.overview.orderBottomUp = newValue;
                     }
                     options: [
                         {
@@ -1161,13 +1202,12 @@ ContentPage {
             }
         }
 
-
         ContentSubsection {
             title: Translation.tr("Scrolling overview style")
             ConfigSelectionArray {
                 currentValue: Config.options.overview.scrollingStyle.backgroundStyle
                 onSelected: newValue => {
-                    Config.options.overview.scrollingStyle.backgroundStyle = newValue
+                    Config.options.overview.scrollingStyle.backgroundStyle = newValue;
                 }
                 options: [
                     {
