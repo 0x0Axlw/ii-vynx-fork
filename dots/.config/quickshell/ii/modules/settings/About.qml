@@ -213,8 +213,6 @@ ContentPage {
             
         }
     }
-}
-
     ContentSection {
         id: sourceSwitchSection
         icon: "swap_horiz"
