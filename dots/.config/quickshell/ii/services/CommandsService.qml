@@ -12,6 +12,7 @@ Singleton {
 
     property ListModel commandsModel: ListModel {}
     property bool importing: false
+    property var tagCounts: ({})
 
     readonly property string filePath: Directories.commandsPath
 
@@ -31,6 +32,23 @@ Singleton {
             });
         }
         fileView.setText(JSON.stringify(arr, null, 2));
+        updateTagCounts();
+    }
+
+    function updateTagCounts() {
+        const counts = {};
+        let total = 0;
+        for (let i = 0; i < commandsModel.count; i++) {
+            total++;
+            const item = commandsModel.get(i);
+            if (!item || !item.tags) continue;
+            for (let t = 0; t < item.tags.count; t++) {
+                const tag = item.tags.get(t).modelData;
+                counts[tag] = (counts[tag] || 0) + 1;
+            }
+        }
+        counts[""] = total;
+        tagCounts = counts;
     }
 
     function addCommand(command, description, tags) {
@@ -66,9 +84,12 @@ Singleton {
         const set = new Set();
         for (let i = 0; i < commandsModel.count; i++) {
             const item = commandsModel.get(i);
+            if (!item || !item.tags || item.tags.count === undefined) continue;
             for (let t = 0; t < item.tags.count; t++) {
-                const tag = item.tags.get(t).modelData;
-                if (tag) set.add(tag);
+                const tagObj = item.tags.get(t);
+                if (tagObj && tagObj.modelData) {
+                    set.add(tagObj.modelData);
+                }
             }
         }
         return Array.from(set).sort();
@@ -97,17 +118,17 @@ Singleton {
                     importFinished(false, "Invalid format: Expected an array of commands.");
                     return;
                 }
-                root.importing = true;
-                data.forEach(item => {
+                const batch = data.map(item => {
                     const id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
                     const tagList = (item.tags || []).map(t => ({ modelData: t }));
-                    commandsModel.append({
+                    return {
                         id: id,
                         command: item.command || "",
                         description: item.description || "",
                         tags: tagList
-                    });
+                    };
                 });
+                commandsModel.append(batch);
                 root.importing = false;
                 save();
                 importFinished(true, "");
@@ -127,16 +148,18 @@ Singleton {
         onLoaded: {
             try {
                 const data = JSON.parse(fileView.text());
-                commandsModel.clear();
-                data.forEach(item => {
+                const batch = data.map(item => {
                     const tagList = (item.tags || []).map(t => ({ modelData: t }));
-                    commandsModel.append({
+                    return {
                         id: item.id || Date.now().toString(36),
                         command: item.command || "",
                         description: item.description || "",
                         tags: tagList
-                    });
+                    };
                 });
+                commandsModel.clear();
+                commandsModel.append(batch);
+                updateTagCounts();
             } catch (e) {
                 console.log("[CommandsService] Error loading: " + e);
             }

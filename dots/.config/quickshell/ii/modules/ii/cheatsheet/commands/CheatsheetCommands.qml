@@ -29,19 +29,26 @@ Item {
     property string lastImportError: ""
     property var filteredIndices: {
         const model = CommandsService.commandsModel;
-        if (!model)
+        if (!model || model.count === undefined)
             return [];
-        const q = root.searchText.toLowerCase();
+        
+        // Force re-evaluation when model changes
+        const _count = model.count;
+        const _tags = CommandsService.tagCounts;
+        
+        const q = (root.searchText || "").toLowerCase();
         const tag = root.activeTag;
         const result = [];
         for (let i = 0; i < model.count; i++) {
             const item = model.get(i);
-            if (!item)
+            if (!item || item.command === undefined)
                 continue;
+            
             let tagMatch = tag === "";
-            if (!tagMatch && item.tags) {
+            if (!tagMatch && item.tags && item.tags.count !== undefined) {
                 for (let t = 0; t < item.tags.count; t++) {
-                    if (item.tags.get(t).modelData === tag) {
+                    const tagObj = item.tags.get(t);
+                    if (tagObj && tagObj.modelData === tag) {
                         tagMatch = true;
                         break;
                     }
@@ -62,27 +69,6 @@ Item {
     function refreshTags() {
         if (CommandsService)
             allTags = CommandsService.allTags();
-    }
-
-    function countForTag(tag) {
-        const model = CommandsService.commandsModel;
-        if (!model)
-            return 0;
-        if (tag === "")
-            return model.count;
-        let count = 0;
-        for (let i = 0; i < model.count; i++) {
-            const item = model.get(i);
-            if (!item || !item.tags)
-                continue;
-            for (let t = 0; t < item.tags.count; t++) {
-                if (item.tags.get(t).modelData === tag) {
-                    count++;
-                    break;
-                }
-            }
-        }
-        return count;
     }
 
     Connections {
@@ -120,6 +106,12 @@ Item {
         id: errorTimer
         interval: 4000
         onTriggered: root.importError = false
+    }
+
+    Timer {
+        id: searchDebounceTimer
+        interval: 150
+        onTriggered: root.searchText = filterField.text
     }
 
     Component.onCompleted: root.refreshTags()
@@ -335,10 +327,10 @@ Item {
                                                     StyledText {
                                                         id: countText
                                                         anchors.centerIn: parent
-                                                        text: root.countForTag(tagMa.tagValue)
+                                                        text: CommandsService.tagCounts[tagMa.tagValue] || 0
                                                         font.pixelSize: Appearance.font.pixelSize.smaller
                                                         font.weight: Font.Bold
-                                                        color: root.activeTag === tagMa.tagValue ? Appearance.colors.colOnPrimary : Appearence.colors.colOnSecondaryContainer
+                                                        color: root.activeTag === tagMa.tagValue ? Appearance.colors.colOnPrimary : Appearance.colors.colOnSecondaryContainer
                                                     }
                                                 }
                                             }
@@ -420,60 +412,66 @@ Item {
                         color: root.colSubtitle
                     }
 
-                    StyledFlickable {
+                    GridView {
+                        id: cardGrid
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        contentHeight: cardGrid.implicitHeight + 100
+                        Layout.leftMargin: 16
+                        Layout.rightMargin: 16
+                        cellWidth: Math.max(100, width / 2)
+                        cellHeight: 180
+                        model: root.filteredIndices
                         clip: true
+                        boundsBehavior: Flickable.StopAtBounds
 
-                        GridLayout {
-                            id: cardGrid
-                            width: parent.width - 32
-                            x: 16
-                            columns: 2
-                            columnSpacing: 10
-                            rowSpacing: 10
+                        delegate: Item {
+                            id: cardDelegate
+                            width: cardGrid.cellWidth
+                            height: cardGrid.cellHeight
 
-                            Repeater {
-                                model: root.filteredIndices
-                                delegate: CommandCard {
-                                    required property int modelData
-                                    readonly property var cmdItem: CommandsService.commandsModel.get(modelData)
+                            readonly property var _item: CommandsService.commandsModel.get(modelData)
 
-                                    Layout.fillWidth: true
-
-                                    commandId: cmdItem?.id ?? ""
-                                    command: cmdItem?.command ?? ""
-                                    description: cmdItem?.description ?? ""
-                                    tags: {
-                                        if (!cmdItem)
-                                            return [];
-                                        const arr = [];
-                                        for (let t = 0; t < cmdItem.tags.count; t++)
-                                            arr.push(cmdItem.tags.get(t).modelData);
-                                        return arr;
-                                    }
-
-                                    onEditClicked: {
-                                        const item = cmdItem;
-                                        if (!item)
-                                            return;
-                                        const tagArr = [];
-                                        for (let t = 0; t < item.tags.count; t++)
-                                            tagArr.push(item.tags.get(t).modelData);
-
-                                        commandForm.mode = "edit";
-                                        commandForm.editId = item.id;
-                                        commandForm.editCommand = item.command;
-                                        commandForm.editDescription = item.description;
-                                        commandForm.editTags = tagArr.join(", ");
-                                        commandForm.isOpen = true;
-                                    }
-
-                                    onDeleteClicked: CommandsService.deleteCommand(commandId)
+                            CommandCard {
+                                id: commandCard
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                
+                                commandId: cardDelegate._item ? cardDelegate._item.id : ""
+                                command: cardDelegate._item ? cardDelegate._item.command : ""
+                                description: cardDelegate._item ? cardDelegate._item.description : ""
+                                tags: {
+                                    if (!cardDelegate._item || !cardDelegate._item.tags) return [];
+                                    const t = [];
+                                    for (let i = 0; i < cardDelegate._item.tags.count; i++)
+                                        t.push(cardDelegate._item.tags.get(i).modelData);
+                                    return t;
                                 }
+
+                                onEditClicked: {
+                                    const item = cardDelegate._item;
+                                    if (!item) return;
+                                    const tagArr = [];
+                                    for (let i = 0; i < item.tags.count; i++)
+                                        tagArr.push(item.tags.get(i).modelData);
+
+                                    commandForm.mode = "edit";
+                                    commandForm.editId = item.id;
+                                    commandForm.editCommand = item.command;
+                                    commandForm.editDescription = item.description;
+                                    commandForm.editTags = tagArr.join(", ");
+                                    commandForm.isOpen = true;
+                                }
+
+                                onDeleteClicked: CommandsService.deleteCommand(commandId)
                             }
                         }
+
+                        footer: Item {
+                            width: cardGrid.width
+                            height: 100
+                        }
+
+                        ScrollBar.vertical: StyledScrollBar {}
                     }
                 }
             }
@@ -518,7 +516,7 @@ Item {
                 placeholderText: focus ? qsTr("Filter commands") : qsTr("Hit \"/\" to filter")
                 clip: true
                 font.pixelSize: Appearance.font.pixelSize.small
-                onTextChanged: root.searchText = text
+                onTextChanged: searchDebounceTimer.restart()
                 colBackground: Qt.alpha(Appearance.colors.colOnSecondaryContainer, 0.05)
                 color: Appearance.colors.colOnSecondaryContainer
                 placeholderTextColor: Qt.alpha(Appearance.colors.colOnSecondaryContainer, 0.6)
