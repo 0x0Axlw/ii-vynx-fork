@@ -23,10 +23,9 @@ MouseArea {
     function abbreviateLayoutCode(fullCode) {
         if (!fullCode)
             return "";
-        return fullCode.split(':').map(layout => {
-            const baseLayout = layout.split('-')[0];
-            return baseLayout.slice(0, 2);
-        }).join('\n').toUpperCase();
+        // Only take the first layout if multiple exist, or just take the first 2 letters of the primary one
+        const firstLayout = fullCode.split(':')[0].split('-')[0];
+        return firstLayout.slice(0, 2).toUpperCase();
     }
 
     Process {
@@ -44,23 +43,25 @@ MouseArea {
     ColumnLayout {
         id: layout
         anchors.centerIn: parent
-        spacing: 2
+        width: parent.width
+        spacing: 0
 
         MaterialSymbol {
-            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
             iconSize: Appearance.font.pixelSize.large
             text: "keyboard"
             color: Appearance.colors.colOnLayer1
         }
 
         StyledText {
-            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
             text: root.abbreviateLayoutCode(HyprlandXkb.currentLayoutCode)
-            font.pixelSize: Appearance.font.pixelSize.small
+            font.pixelSize: 10
             font.family: Appearance.font.family.title
             color: Appearance.colors.colOnLayer1
-            font.weight: Font.Bold
-            horizontalAlignment: Text.AlignHCenter
+            font.weight: Font.Black
             animateChange: true
         }
     }

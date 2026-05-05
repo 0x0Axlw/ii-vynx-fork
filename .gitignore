@@ -21,3 +21,4 @@ __pycache__/
 /dots/.config/quickshell/ii/scripts/sync_to_vynx.sh
 /dots/.config/quickshell/ii/scripts/colors/switchwall.sh
 /dots/.config/quickshell/ii/assets/images/devices/device_68_7D_6B_94_0B_C2.png
+/dots/.config/quickshell/ii/.env.example

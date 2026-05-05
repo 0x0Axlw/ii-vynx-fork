@@ -37,111 +37,167 @@ MouseArea {
     }
 
     implicitWidth: Appearance.sizes.baseVerticalBarWidth
-    implicitHeight: Config.options.battery.style === "android16" ? (14 * 2) + 12 : batteryContainer.height + 12
+    implicitHeight: mainLayout.implicitHeight + 12
 
     hoverEnabled: !Config.options.bar.tooltips.clickToShow
 
-    anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
-
-    Android16Battery {
+    ColumnLayout {
+        id: mainLayout
         anchors.centerIn: parent
-        visible: Config.options.battery.style === "android16"
-        height: 14
-        width: height * 2
-        batteryLevel: Math.round(root.percentage * 100)
-        isCharging: root.isCharging || root.isPluggedIn
-        isPowerSaving: false
-    }
+        spacing: 2
 
-    Item {
-        id: batteryContainer
-        visible: Config.options.battery.style !== "android16"
-        anchors.centerIn: parent
-        height: 14
-        width: height * (28 / 13)
+        // Android 16 Style
+        Item {
+            id: android16Battery
+            visible: Config.options.battery.style === "android16"
+            Layout.alignment: Qt.AlignHCenter
+            width: 16
+            height: 31
 
-        // ── Camada 1: Fill (sem clipping, com rounding próprio) ──
-        Rectangle {
-            id: fillBar
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.leftMargin: 3
+            Item {
+                anchors.centerIn: parent
+                width: 31
+                height: 16
+                rotation: -90
 
-            readonly property real bodyInnerWidth: (parent.width * (24 / 28)) - 6
-            readonly property real clampedPct: Math.max(0, Math.min(1, root.percentage))
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 1
 
-            height: parent.height - 6
-            width: Math.max(0, bodyInnerWidth * clampedPct)
-            radius: 1.5
-            color: root.fillColor
-            z: 0
+                    ClippedProgressBar {
+                        id: batteryProgress
+                        width: 28
+                        height: 16
+                        radius: 4.5
+                        value: root.percentage
 
-            Behavior on width {
-                NumberAnimation {
-                    duration: Appearance.animation.elementMoveFast.duration
-                    easing.type: Appearance.animation.elementMoveFast.type
-                    easing.bezierCurve: Appearance.animation.elementMoveFast.bezierCurve
+                        highlightColor: {
+                            if (root.isLow && !root.isCharging)
+                                return Appearance.m3colors.m3error;
+                            if (root.isCharging || root.isPluggedIn)
+                                return "#43A047";
+                            return root.frameColor;
+                        }
+                        trackColor: Qt.rgba(root.frameColor.r, root.frameColor.g, root.frameColor.b, 0.3)
+
+                        textMask: Item {
+                            width: 28
+                            height: 16
+                            StyledText {
+                                anchors.centerIn: parent
+                                anchors.verticalCenterOffset: 1
+                                text: Math.round(root.percentage * 100)
+                                font.pixelSize: 10
+                                font.weight: Font.Black
+                                color: "white"
+                            }
+                        }
+                    }
+
+                    // Battery Tip
+                    Rectangle {
+                        width: 2
+                        height: 6
+                        anchors.verticalCenter: parent.verticalCenter
+                        radius: 1
+                        color: (root.percentage >= 0.98) ? batteryProgress.highlightColor : batteryProgress.trackColor
+                    }
                 }
-            }
 
-            Behavior on color {
-                ColorAnimation {
-                    duration: Appearance.animation.elementMoveFast.duration
-                    easing.type: Appearance.animation.elementMoveFast.type
-                    easing.bezierCurve: Appearance.animation.elementMoveFast.bezierCurve
+                // Bolt Overlay
+                MaterialSymbol {
+                    visible: root.isCharging || root.isPluggedIn
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.right
+                    anchors.horizontalCenterOffset: -1
+                    text: "bolt"
+                    iconSize: 14
+                    fill: 1
+                    color: Appearance.colors.colOnSecondaryContainer
                 }
             }
         }
 
-        // ── Camada 2: Moldura SVG ──
-        CustomIcon {
-            anchors.fill: parent
-            source: "Battery.svg"
-            colorize: true
-            color: root.frameColor
-            z: 1
+        // Classic / Default Style
+        Item {
+            id: batteryContainer
+            visible: Config.options.battery.style !== "android16"
+            Layout.alignment: Qt.AlignHCenter
+            height: 24
+            width: 12
 
-            Behavior on color {
-                ColorAnimation {
-                    duration: Appearance.animation.elementMoveFast.duration
-                    easing.type: Appearance.animation.elementMoveFast.type
-                    easing.bezierCurve: Appearance.animation.elementMoveFast.bezierCurve
+            Item {
+                anchors.centerIn: parent
+                width: 24
+                height: 12
+                rotation: -90
+
+                // ── Camada 1: Fill ──
+                Item {
+                    id: fillClipping
+                    clip: true
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+
+                    readonly property real clampedPct: Math.max(0, Math.min(1, root.percentage))
+                    width: parent.width * clampedPct
+                    z: 0
+
+                    Rectangle {
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        anchors.leftMargin: 2
+
+                        height: parent.height - 4
+                        width: (24 * (20 / 24)) - 4
+
+                        radius: 1
+                        color: root.fillColor
+
+                        StyledText {
+                            anchors.centerIn: parent
+                            anchors.horizontalCenterOffset: 1
+                            text: Math.round(root.percentage * 100)
+                            font.pixelSize: 8
+                            font.weight: Font.Black
+                            color: "white"
+                        }
+                    }
+                }
+
+                // ── Camada 2: Moldura SVG ──
+                CustomIcon {
+                    anchors.fill: parent
+                    source: "Battery.svg"
+                    colorize: true
+                    color: root.frameColor
+                    z: 1
+                }
+
+                // ── Camada 3: Bolt ──
+                MaterialSymbol {
+                    visible: root.isCharging || root.isPluggedIn
+                    anchors.centerIn: parent
+                    anchors.horizontalCenterOffset: -2
+                    text: "bolt"
+                    iconSize: 14
+                    fill: 1
+                    color: Appearance.colors.colLayer0
+                    z: 2
+                }
+
+                MaterialSymbol {
+                    visible: root.isCharging || root.isPluggedIn
+                    anchors.centerIn: parent
+                    anchors.horizontalCenterOffset: -2
+                    text: "bolt"
+                    iconSize: 12
+                    fill: 1
+                    color: Appearance.colors.colOnSecondaryContainer
+                    z: 3
                 }
             }
-        }
-
-        // ── Camada 3: Bolt outline (knockout — cor de fundo anula fill e frame) ──
-        MaterialSymbol {
-            visible: root.isCharging || root.isPluggedIn
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: -(parent.width * (4 / 28)) / 2
-
-            anchors.top: parent.top
-            anchors.topMargin: -5
-
-            text: "bolt"
-            iconSize: 17
-            fill: 1
-            color: Appearance.colors.colLayer0
-            z: 2
-        }
-
-        // ── Camada 4: Bolt principal (por cima do knockout) ──
-        MaterialSymbol {
-            visible: root.isCharging || root.isPluggedIn
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: -(parent.width * (4 / 28)) / 2
-
-            anchors.top: parent.top
-            anchors.topMargin: -6
-
-            text: "bolt"
-            iconSize: 16
-            fill: 1
-            color: Appearance.colors.colOnSecondaryContainer
-            z: 3
         }
     }
 
