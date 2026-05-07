@@ -8,6 +8,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import qs.modules.ii.bar as Bar
 
 Item {
     id: wrappedFrame
@@ -15,6 +16,9 @@ Item {
     property int frameThickness: Config.options.appearance.wrappedFrameThickness
     property bool barVertical: Config.options.bar.vertical
     property bool barBottom: Config.options.bar.bottom
+
+    Bar.BarThemes { id: barThemes }
+    property var activeTheme: barThemes.getTheme(Config.options.bar.expressiveColorTheme)
 
     Loader {
         active: Config.options.appearance.fakeScreenRounding == 3
@@ -104,7 +108,7 @@ Item {
                     exclusionMode: ExclusionMode.Ignore
                     mask: Region {} // Ignore pointer events so normal windows are clickable
 
-                    property color baseColor: monitorScope.showBarBackground ? Appearance.colors.colLayer0 : "transparent"
+                    property color baseColor: monitorScope.showBarBackground ? (Config.options.bar.expressiveColors ? activeTheme.barBackground : Appearance.colors.colLayer0) : "transparent"
                     Behavior on baseColor { 
                         animation: Appearance.animation.elementMoveFast.colorAnimation.createObject(combinedFrameWindow) 
                     }

@@ -338,6 +338,11 @@ ContentPage {
                             displayName: Translation.tr("Wrapped"),
                             icon: "capture",
                             value: 3
+                        },
+                        {
+                            displayName: Translation.tr("Edge"),
+                            icon: "border_bottom",
+                            value: 4
                         }
                     ]
                 }

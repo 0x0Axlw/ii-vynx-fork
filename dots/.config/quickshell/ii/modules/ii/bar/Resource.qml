@@ -49,11 +49,13 @@ Item {
             }
         }
 
-        //COLOQUEI +5 AQUI PARA DAR ESPAÇO PRO % FICAR INTEIRO
         Item {
+            id: percentageTextContainer
             Layout.alignment: Qt.AlignVCenter
-            implicitWidth: fullPercentageTextMetrics.width + 5
+            implicitWidth: Config.options.bar.resources.showPercentageText ? (fullPercentageTextMetrics.width + 5) : 0
             implicitHeight: percentageText.implicitHeight
+            visible: Config.options.bar.resources.showPercentageText
+            clip: true
 
             TextMetrics {
                 id: fullPercentageTextMetrics
@@ -67,6 +69,13 @@ Item {
                 color: Appearance.colors.colOnLayer1
                 font.pixelSize: Appearance.font.pixelSize.small
                 text: `${Math.round(percentage * 100).toString()}%`
+            }
+            
+            Behavior on implicitWidth {
+                NumberAnimation {
+                    duration: Appearance.animation.elementMoveFast.duration
+                    easing.type: Appearance.animation.elementMoveFast.type
+                }
             }
         }
 

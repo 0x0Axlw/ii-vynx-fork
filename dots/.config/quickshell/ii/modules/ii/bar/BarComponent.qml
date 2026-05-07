@@ -78,14 +78,19 @@ Item {
         }
     }
 
+    BarThemes { id: barThemes }
+    property var activeTheme: barThemes.getTheme(Config.options.bar.expressiveColorTheme)
+
     readonly property int barGroupStyle: Config.options.bar.barGroupStyle
     readonly property int barBackgroundStyle: Config.options.bar.barBackgroundStyle
-    property color colBackground: barGroupStyle == 0 ? Appearance.colors.colLayer1 :
+    property color colBackground: Config.options.bar.expressiveColors ? activeTheme.componentBackground : (
+                                   barGroupStyle == 0 ? Appearance.colors.colLayer1 :
                                    (barGroupStyle == 1 && barBackgroundStyle == 1) ? Appearance.colors.colLayer1 :
                                    (barGroupStyle == 1) ? Appearance.m3colors.m3surfaceContainerLow :
-                                   "transparent";
+                                   "transparent"
+                                  );
     
-    property color colBackgroundHighlight: Appearance.colors.colPrimary
+    property color colBackgroundHighlight: Config.options.bar.expressiveColors ? activeTheme.highlight : Appearance.colors.colPrimary
 
     BarGroup {
         id: wrapper

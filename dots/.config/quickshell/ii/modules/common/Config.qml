@@ -327,6 +327,8 @@ Singleton {
                 property int barGroupStyle: 0 // 0: Pills | 1: Island (opaque) | 2: Transparent (or maybe line-separated in the future)
                 property string topLeftIcon: "spark" // Options: "distro" or any icon name in ~/.config/quickshell/ii/assets/icons
                 property int barBackgroundStyle: 1 // 0: Transparent | 1: Visible | 2: Adaptive
+                property bool expressiveColors: false
+                property string expressiveColorTheme: "content"
                 property bool verbose: true
                 property bool vertical: false
 
@@ -347,6 +349,7 @@ Singleton {
                 }
 
                 property JsonObject resources: JsonObject {
+                    property bool showPercentageText: true
                     property int memoryWarningThreshold: 95
                     property int swapWarningThreshold: 85
                     property int cpuWarningThreshold: 90

@@ -19,7 +19,8 @@ ContentPage {
             "system_tray": systemTray,
             "workspaces": workspaces,
             "timer": indicators,
-            "record_indicator": indicators
+            "record_indicator": indicators,
+            "system_monitor": resourcesConfig
         })
 
     function scrollTo(stringId) {
@@ -246,6 +247,57 @@ ContentPage {
                         value: 0
                     }
                 ]
+            }
+        }
+
+        ContentSubsection {
+            title: Translation.tr("Expressive bar colors")
+            tooltip: Translation.tr("Use expressive colors instead of solid layer colors")
+            Layout.fillWidth: true
+            
+            ConfigRow {
+                ConfigSwitch {
+                    buttonIcon: "palette"
+                    text: Translation.tr("Enable")
+                    checked: Config.options.bar.expressiveColors
+                    onCheckedChanged: {
+                        Config.options.bar.expressiveColors = checked;
+                    }
+                }
+                
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                ConfigSelectionArray {
+                    enabled: Config.options.bar.expressiveColors
+                    currentValue: Config.options.bar.expressiveColorTheme
+                    onSelected: newValue => {
+                        Config.options.bar.expressiveColorTheme = newValue;
+                    }
+                    options: [
+                        {
+                            displayName: Translation.tr("Content"),
+                            icon: "brush",
+                            value: "content"
+                        },
+                        {
+                            displayName: Translation.tr("Vibrant"),
+                            icon: "brush",
+                            value: "primary"
+                        },
+                        {
+                            displayName: Translation.tr("Secondary"),
+                            icon: "brush",
+                            value: "secondary"
+                        },
+                        {
+                            displayName: Translation.tr("Surface"),
+                            icon: "brush",
+                            value: "surface"
+                        }
+                    ]
+                }
             }
         }
     }
@@ -728,6 +780,21 @@ ContentPage {
             checked: Config.options.bar.tooltips.enableBluetoothConnectionPopup
             onCheckedChanged: {
                 Config.options.bar.tooltips.enableBluetoothConnectionPopup = checked;
+            }
+        }
+    }
+
+    ContentSection {
+        id: resourcesConfig
+        icon: "memory"
+        title: Translation.tr("Resources")
+
+        ConfigSwitch {
+            buttonIcon: "percent"
+            text: Translation.tr("Show percentage text")
+            checked: Config.options.bar.resources.showPercentageText
+            onCheckedChanged: {
+                Config.options.bar.resources.showPercentageText = checked;
             }
         }
     }
