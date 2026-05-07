@@ -426,24 +426,27 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
 
         Loader {
             id: modelAndProviderLoader
-            Layout.fillWidth: true
+            width: item?.implicitWidth
             height: item?.implicitHeight
+            Layout.alignment: Qt.AlignHCenter
 
             active: Config.options.sidebar.ai.showProviderAndModelButtons && Ai.messageIDs.length === 0
             visible: active
 
             sourceComponent: Item {
+                implicitWidth: contentLayout.implicitWidth
                 implicitHeight: contentLayout.implicitHeight
+                anchors.horizontalCenter: parent.horizontalCenter
 
                 ColumnLayout {
                     id: contentLayout
-                    anchors.left: parent.left
-                    anchors.right: parent.right
+                    width: 330
+                    anchors.horizontalCenter: parent.horizontalCenter
 
                     ConfigSelectionArray {
                         id: providerSelector
-                        Layout.fillWidth: true
-                        fillEqually: true
+                        Layout.alignment: Qt.AlignHCenter
+                        width: parent.width
 
                         currentValue: Persistent.states.ai.provider
                         onSelected: newValue => {

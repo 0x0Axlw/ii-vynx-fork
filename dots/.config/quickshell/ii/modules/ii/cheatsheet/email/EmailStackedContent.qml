@@ -156,7 +156,7 @@ Item {
         y: isAnimating ? undefined : 0
         width: isAnimating ? undefined : root.width
         height: isAnimating ? undefined : root.height
-        color: Appearance.colors.colLayer0
+        color: Config.options.appearance.transparency.enable ? Appearance.colors.colLayer0 : Appearance.m3colors.m3surfaceContainerLow
         topLeftRadius: Appearance.rounding.small
         topRightRadius: Appearance.rounding.verylarge
         bottomLeftRadius: Appearance.rounding.small
@@ -318,7 +318,7 @@ Item {
                                         id: backgroundRect
                                         anchors.fill: parent
                                         radius: Appearance.rounding.large
-                                        color: isExpanded ? Appearance.colors.colLayer1 : (msgMouse.pressed ? Appearance.colors.colSurfaceContainerHighestActive : (msgMouse.containsMouse ? Appearance.colors.colSurfaceContainerHighestHover : (model.unread ? Appearance.colors.colSecondaryContainer : Appearance.colors.colSurfaceContainerHigh)))
+                                        color: isExpanded ? (Config.options.appearance.transparency.enable ? Appearance.colors.colLayer1 : Appearance.m3colors.m3surfaceContainerLow) : (msgMouse.pressed ? Appearance.colors.colSurfaceContainerHighestActive : (msgMouse.containsMouse ? Appearance.colors.colSurfaceContainerHighestHover : (model.unread ? Appearance.colors.colSecondaryContainer : Appearance.colors.colSurfaceContainerHigh)))
                                         border.width: model.unread ? 2 : 0
                                         border.color: Appearance.colors.colPrimary
                                         clip: true

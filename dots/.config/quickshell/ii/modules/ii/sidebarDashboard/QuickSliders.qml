@@ -27,7 +27,9 @@ Rectangle {
     property bool showGamma: Config.options.sidebar.quickSliders.showGamma
     property bool showMic: Config.options.sidebar.quickSliders.showMic
 
-    ColumnLayout {
+    property bool isVertical: Config.options.sidebar.quickSliders.vertical
+
+    GridLayout {
         id: contentItem
         anchors {
             fill: parent
@@ -37,14 +39,21 @@ Rectangle {
             bottomMargin: root.verticalPadding
         }
 
-        spacing: 4
+        rowSpacing: 4
+        columnSpacing: 8
+        columns: root.isVertical ? 1 : activeCount
+        rows: root.isVertical ? activeCount : 1
 
-        property int activeCount: {
+        readonly property int activeCount: {
             let count = 0;
-            for (let i = 0; i < repeater.count; i++) {
-                if (repeater.itemAt(i) && repeater.itemAt(i).visible)
-                    count++;
-            }
+            if (showBrightness)
+                count++;
+            if (showVolume)
+                count++;
+            if (showMic)
+                count++;
+            if (showGamma)
+                count++;
             return count;
         }
 
@@ -52,17 +61,46 @@ Rectangle {
             id: repeater
             model: [
                 {
-                    show: true,
+                    show: showBrightness,
                     icon: "brightness_6",
                     getVal: () => root.brightnessMonitor.brightness,
                     setVal: v => root.brightnessMonitor.setBrightness(v)
                 },
                 {
-                    show: true,
+                    show: showVolume,
                     icon: "volume_up",
                     getVal: () => Audio.sink.audio.volume,
                     setVal: v => {
                         Audio.sink.audio.volume = v;
+                    }
+                },
+                {
+                    show: showMic,
+                    icon: "mic",
+                    getVal: () => Audio.source.audio.volume,
+                    setVal: v => {
+                        Audio.source.audio.volume = v;
+                    }
+                },
+                {
+                    show: showGamma,
+                    icon: "light_mode",
+                    secondaryIcon: "wb_twilight",
+                    getVal: () => Hyprsunset.gamma === 100 ? 0.3 + root.brightnessMonitor?.brightness * 0.7 : (Hyprsunset.gamma - Hyprsunset.gammaLowerLimit) / (100 - Hyprsunset.gammaLowerLimit) * 0.3,
+                    setVal: v => {
+                        if (v >= 0.3) {
+                            // 0.3 - 1.0 brightness
+                            root.brightnessMonitor.setBrightness((v - 0.3) / 0.7);
+                            if (Hyprsunset.gamma !== 100) {
+                                Hyprsunset.setGamma(100);
+                            }
+                        } else {
+                            // 0 - 0.3 gamma
+                            if (root.brightnessMonitor.brightness !== 0) {
+                                root.brightnessMonitor.setBrightness(0);
+                            }
+                            Hyprsunset.setGamma((v / 0.3 * (100 - Hyprsunset.gammaLowerLimit) + Hyprsunset.gammaLowerLimit));
+                        }
                     }
                 }
             ]
@@ -84,8 +122,6 @@ Rectangle {
         required property string materialSymbol
         property string secondaryMaterialSymbol
         configuration: StyledSlider.Configuration.M
-        topPadding: 0
-        bottomPadding: 0
         stopIndicatorValues: []
         dividerValues: secondaryMaterialSymbol.length > 0 ? [secondaryIcon.iconLocation] : []
 

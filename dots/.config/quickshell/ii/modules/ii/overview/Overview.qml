@@ -28,7 +28,7 @@ Scope {
             id: realOverviewLoader
             required property var modelData
             property int monitorIndex: overviewVariant.variantModel.indexOf(modelData)
-            property bool monitorIsFocused: (Hyprland.focusedMonitor?.name === modelData.name)
+            property bool monitorIsFocused: (Hyprland.focusedMonitor?.id == monitorIndex)
             active: monitorIsFocused
 
             component: PanelWindow {

@@ -13,7 +13,7 @@ import Qt.labs.folderlistmodel
 Item {
     id: root
 
-    readonly property color colBg: Appearance.colors.colLayer0
+    readonly property color colBg: Config.options.appearance.transparency.enable ? Appearance.colors.colLayer0 : Appearance.m3colors.m3surfaceContainerLow
     readonly property color colTitle: Appearance.colors.colOnSurface
     readonly property color colSubtitle: Appearance.colors.colOnSurfaceVariant
     readonly property color colAccent: Appearance.colors.colPrimary
@@ -575,7 +575,7 @@ Item {
     Rectangle {
         id: qmlFilePicker
         anchors.fill: parent
-        color: Appearance.colors.colLayer1Base
+        color: Config.options.appearance.transparency.enable ? Appearance.colors.colLayer1Base : Appearance.m3colors.m3surfaceContainerLow
         visible: false
         z: 100
         radius: Appearance.rounding.windowRounding

@@ -151,7 +151,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: Appearance.colors.colLayer0
+        color: Config.options.appearance.transparency.enable ? Appearance.colors.colLayer0 : Appearance.m3colors.m3surfaceContainerLow
         topLeftRadius: Appearance.rounding.small
         topRightRadius: Appearance.rounding.verylarge
         bottomLeftRadius: Appearance.rounding.small

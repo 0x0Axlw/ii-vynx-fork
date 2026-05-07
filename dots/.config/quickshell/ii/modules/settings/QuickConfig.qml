@@ -102,7 +102,7 @@ ContentPage {
                         colBackgroundHover: ColorUtils.transparentize(Appearance.colors.colOnPrimary, 0.85)
                         colRipple: ColorUtils.transparentize(Appearance.colors.colOnPrimary, 0.5)
                         onClicked: {
-                            Quickshell.execDetached(["qs", "-p", FileUtils.trimFileProtocol(Directories.shellConfig), "ipc", "call", "wallpaperSelector", "toggle"]);
+                            Quickshell.execDetached(`${Directories.wallpaperSwitchScriptPath}`);
                         }
                     }
                 }
@@ -250,6 +250,7 @@ ContentPage {
         ConfigRow {
             ContentSubsection {
                 title: Translation.tr("Bar position")
+                Layout.fillWidth: true
                 ConfigSelectionArray {
                     currentValue: (Config.options.bar.bottom ? 1 : 0) | (Config.options.bar.vertical ? 2 : 0)
                     onSelected: newValue => {
@@ -282,6 +283,7 @@ ContentPage {
             }
             ContentSubsection {
                 title: Translation.tr("Bar style")
+                Layout.fillWidth: false
 
                 ConfigSelectionArray {
                     currentValue: Config.options.bar.cornerStyle
@@ -312,6 +314,7 @@ ContentPage {
         ConfigRow {
             ContentSubsection {
                 title: Translation.tr("Screen round corner")
+                Layout.fillWidth: true
 
                 ConfigSelectionArray {
                     currentValue: Config.options.appearance.fakeScreenRounding
@@ -391,6 +394,39 @@ ContentPage {
                     ]
                 }
             }
+
+            ContentSubsection {
+                title: Translation.tr("Hyprland layout")
+                Layout.fillWidth: false
+
+                ConfigSelectionArray {
+                    currentValue: {
+                        if (Persistent.states.hyprland.layout !== "scrolling") return "default"
+                        else return "scrolling"
+                    }
+                    onSelected: newValue => {
+                        console.log(newValue)
+                        if (newValue === "scrolling") {
+                            HyprlandSettings.setLayout("scrolling")
+                        } else {
+                            const defaultLayout = Config.options.hyprland.defaultHyprlandLayout
+                            HyprlandSettings.setLayout(defaultLayout)
+                        }
+                    }
+                    options: [ 
+                        {
+                            displayName: Translation.tr("Default"),
+                            icon: "mobile_layout",
+                            value: "default"
+                        }, 
+                        {
+                            displayName: Translation.tr("Scrolling"),
+                            icon: "view_carousel",
+                            value: "scrolling"
+                        }
+                    ]
+                }
+            }              
 
             ContentSubsection {
                 title: Translation.tr("Rounding style")

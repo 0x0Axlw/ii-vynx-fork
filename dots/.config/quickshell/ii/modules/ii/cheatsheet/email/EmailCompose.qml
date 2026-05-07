@@ -262,7 +262,7 @@ Item {
     Rectangle {
         id: background
         anchors.fill: parent
-        color: Appearance.m3colors.m3surface // Solid surface color
+        color: Appearance.m3colors.m3surfaceContainerLow // Solid surface color
         visible: root.isOpen || root.isAnimating
         opacity: root.isOpen ? 1 : 0
         Behavior on opacity {
@@ -648,7 +648,7 @@ Item {
                         height: 64
                         width: toolbarRow.implicitWidth + 48
                         radius: Appearance.rounding.full
-                        color: Appearance.colors.colLayer0
+                        color: Config.options.appearance.transparency.enable ? Appearance.colors.colLayer0 : Appearance.m3colors.m3surfaceContainerLow
                         z: 3
 
                         // Catch mouse events on the toolbar background so they don't
@@ -1079,7 +1079,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 radius: Appearance.rounding.large
-                color: Appearance.colors.colLayer1
+                color: Config.options.appearance.transparency.enable ? Appearance.colors.colLayer1 : Appearance.m3colors.m3surfaceContainerLow
                 clip: true
 
                 ListView {

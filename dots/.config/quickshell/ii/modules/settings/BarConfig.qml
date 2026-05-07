@@ -251,8 +251,8 @@ ContentPage {
         }
 
         ContentSubsection {
-            title: Translation.tr("Expressive bar colors")
-            tooltip: Translation.tr("Use expressive colors instead of solid layer colors")
+            title: Translation.tr("Expressive bar solid colors")
+            tooltip: Translation.tr("Use expressive solid layer colors")
             Layout.fillWidth: true
             
             ConfigRow {

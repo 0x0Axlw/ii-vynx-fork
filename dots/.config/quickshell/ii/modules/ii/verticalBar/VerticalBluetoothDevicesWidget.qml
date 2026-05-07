@@ -14,6 +14,19 @@ MouseArea {
     readonly property var primaryDevice: activeDevices.length > 0 ? activeDevices[deviceIndex % activeDevices.length] : null
     readonly property bool hasDevices: activeDevices.length > 0
 
+    Connections {
+        target: BluetoothStatus
+        function onConnectedDevicesChanged() {
+            if (typeof rootItem !== "undefined")
+                rootItem.toggleVisible(BluetoothStatus.connectedDevices.length > 0)
+        }
+    }
+
+    Component.onCompleted: {
+        if (typeof rootItem !== "undefined")
+            rootItem.toggleVisible(hasDevices)
+    }
+
     implicitWidth: Appearance.sizes.baseVerticalBarWidth
     implicitHeight: chip.implicitHeight
 

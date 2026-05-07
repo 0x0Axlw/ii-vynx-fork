@@ -101,8 +101,6 @@ Scope {
                 }
             }
 
-
-
             StyledRectangularShadow {
                 target: cheatsheetBackground
             }
@@ -210,7 +208,6 @@ Scope {
                             }
                         }
 
-                        
                         Repeater {
                             model: root.tabButtonList
                             delegate: Loader {
@@ -222,17 +219,24 @@ Scope {
                                 property bool _lazy: modelData.icon === "calendar_month" || modelData.icon === "mail"
                                 property bool _wasSeen: false
                                 active: !_lazy || swipeView.currentIndex === index || _wasSeen
-                                onActiveChanged: if (active) _wasSeen = true
+                                onActiveChanged: if (active)
+                                    _wasSeen = true
 
                                 asynchronous: _lazy
                                 source: {
                                     switch (modelData.icon) {
-                                        case "calendar_month": return "CheatsheetTimetable.qml";
-                                        case "keyboard":       return "CheatsheetKeybinds.qml";
-                                        case "experiment":     return "CheatsheetPeriodicTable.qml";
-                                        case "terminal":       return "commands/CheatsheetCommands.qml";
-                                        case "mail":           return "CheatsheetEmail.qml";
-                                        default:               return "";
+                                    case "calendar_month":
+                                        return "CheatsheetTimetable.qml";
+                                    case "keyboard":
+                                        return "CheatsheetKeybinds.qml";
+                                    case "experiment":
+                                        return "CheatsheetPeriodicTable.qml";
+                                    case "terminal":
+                                        return "commands/CheatsheetCommands.qml";
+                                    case "mail":
+                                        return "CheatsheetEmail.qml";
+                                    default:
+                                        return "";
                                     }
                                 }
 
@@ -241,7 +245,9 @@ Scope {
                                     anchors.fill: parent
                                     color: "transparent"
                                     visible: tabDelegate._lazy && tabDelegate.status !== Loader.Ready
-                                    MaterialLoadingIndicator { anchors.centerIn: parent }
+                                    MaterialLoadingIndicator {
+                                        anchors.centerIn: parent
+                                    }
                                 }
                             }
                         }

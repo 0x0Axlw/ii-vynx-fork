@@ -249,7 +249,7 @@ Item {
             // Global Loading Overlay - Only shown if the list is empty and we are fetching
             Rectangle {
                 anchors.fill: parent
-                color: Appearance.colors.colLayer0
+                color: Config.options.appearance.transparency.enable ? Appearance.colors.colLayer0 : Appearance.m3colors.m3surfaceContainerLow
                 visible: EmailService.loading && emailInbox.model.count === 0 && EmailService.authenticated && root.activeTab !== "settings"
                 z: 100
                 radius: Appearance.rounding.windowRounding

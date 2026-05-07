@@ -354,6 +354,15 @@ Singleton {
                     property int swapWarningThreshold: 85
                     property int cpuWarningThreshold: 90
                 }
+
+                property JsonObject sports: JsonObject {
+                    property bool enable: false
+                    property string sport: "soccer"
+                    property string league: "eng.1"
+                    property string teamFilter: ""
+                    property int updateInterval: 60
+                }
+
                 property list<string> screenList: [] // List of names, like "eDP-1", find out with 'hyprctl monitors' command
 
                 property JsonObject timers: JsonObject {
@@ -785,6 +794,7 @@ Singleton {
 
                 property JsonObject quickSliders: JsonObject {
                     property bool enable: true
+                    property bool vertical: false
                     property bool showMic: true
                     property bool showGamma: true
                     property bool showVolume: true

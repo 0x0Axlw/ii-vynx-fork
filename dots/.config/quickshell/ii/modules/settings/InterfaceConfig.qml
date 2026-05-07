@@ -889,7 +889,16 @@ ContentPage {
                     Config.options.sidebar.quickSliders.showMic = checked;
                 }
             }
+            ConfigSwitch {
+            buttonIcon: "vertical_align_center"
+            enabled: Config.options.sidebar.quickSliders.enable
+            text: Translation.tr("Vertical layout")
+            checked: Config.options.sidebar.quickSliders.vertical
+            onCheckedChanged: {
+                Config.options.sidebar.quickSliders.vertical = checked;
+            }
         }
+    }
 
         ContentSubsection {
             title: Translation.tr("Corner open")
