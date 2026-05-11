@@ -28,7 +28,10 @@ Singleton {
         }
     }
 
-    function applyTheme() {
+    property bool reloadOnFinish: false
+
+    function applyTheme(reload = false) {
+        root.reloadOnFinish = reload;
         applyProcess.running = true;
     }
 
@@ -38,11 +41,22 @@ Singleton {
 
         onRunningChanged: {
             if (!running && exitCode === 0) {
-                // Restart quickshell
-                Quickshell.execDetached({
-                    command: ["quickshell", "--reload"]
-                });
+                // Instantly refresh all icons system-wide using our reactivity
+                TaskbarApps.iconThemeRevision += 1;
+                
+                if (root.reloadOnFinish) {
+                    Quickshell.reload();
+                }
             }
+        }
+    }
+
+    FileView {
+        path: Directories.home + "/.local/share/icons/TemaDinamico.colhash"
+        watchChanges: true
+        onFileChanged: {
+            // Background generation finished and written out new colors hash.
+            TaskbarApps.iconThemeRevision += 1;
         }
     }
 

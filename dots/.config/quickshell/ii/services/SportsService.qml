@@ -12,7 +12,7 @@ Item {
 
     property var allGames: []
     property int currentGameIndex: 0
-    property var currentGame: allGames.length > 0 ? allGames[currentGameIndex] : null
+    property var currentGame: null
 
     property bool loading: false
     property string error: ""
@@ -20,6 +20,7 @@ Item {
     function nextGame() {
         if (allGames.length > 1) {
             currentGameIndex = (currentGameIndex + 1) % allGames.length;
+            currentGame = allGames[currentGameIndex];
         }
     }
 
@@ -162,8 +163,22 @@ Item {
             }
 
             if (matchesFilter) {
-                const situation = comp.situation || null;
-                const lastPlayText = situation && situation.lastPlay && situation.lastPlay.text ? situation.lastPlay.text : "";
+                let lastPlayText = "";
+                if (state === "in") {
+                    const situation = comp.situation || null;
+                    lastPlayText = situation && situation.lastPlay && situation.lastPlay.text ? situation.lastPlay.text : "";
+
+                    if (lastPlayText === "" && comp.details && comp.details.length > 0) {
+                        const lastEvent = comp.details[comp.details.length - 1];
+                        const type = lastEvent.type ? lastEvent.type.text : "";
+                        const athlete = lastEvent.athletesInvolved && lastEvent.athletesInvolved.length > 0 ? lastEvent.athletesInvolved[0].displayName : "";
+                        const clock = lastEvent.clock ? lastEvent.clock.displayValue : "";
+
+                        if (type !== "") {
+                            lastPlayText = `${type}${athlete !== "" ? " - " + athlete : ""}${clock !== "" ? " (" + clock + ")" : ""}`;
+                        }
+                    }
+                }
 
                 validGames.push({
                     id: event.id,
@@ -193,10 +208,29 @@ Item {
             return (order[a.state] || 3) - (order[b.state] || 3);
         });
 
-        allGames = validGames;
-        if (currentGameIndex >= allGames.length) {
-            currentGameIndex = 0;
+        let nextIndex = 0;
+        let currentId = currentGame ? currentGame.id : null;
+        
+        if (currentId) {
+            let foundIndex = -1;
+            for (let i = 0; i < validGames.length; i++) {
+                if (validGames[i].id === currentId) {
+                    foundIndex = i;
+                    break;
+                }
+            }
+            if (foundIndex !== -1) {
+                nextIndex = foundIndex;
+            } else if (currentGameIndex < validGames.length) {
+                nextIndex = currentGameIndex;
+            }
+        } else if (currentGameIndex < validGames.length) {
+            nextIndex = currentGameIndex;
         }
+
+        allGames = validGames;
+        currentGameIndex = nextIndex;
+        currentGame = allGames.length > 0 ? allGames[currentGameIndex] : null;
     }
 
     Timer {
@@ -214,6 +248,7 @@ Item {
         } else {
             allGames = [];
             currentGameIndex = 0;
+            currentGame = null;
         }
     }
 

@@ -239,7 +239,6 @@ ContentPage {
                 }
             }
         }
-
     }
 
     ContentSection {
@@ -401,24 +400,26 @@ ContentPage {
 
                 ConfigSelectionArray {
                     currentValue: {
-                        if (Persistent.states.hyprland.layout !== "scrolling") return "default"
-                        else return "scrolling"
+                        if (Persistent.states.hyprland.layout !== "scrolling")
+                            return "default";
+                        else
+                            return "scrolling";
                     }
                     onSelected: newValue => {
-                        console.log(newValue)
+                        console.log(newValue);
                         if (newValue === "scrolling") {
-                            HyprlandSettings.setLayout("scrolling")
+                            HyprlandSettings.setLayout("scrolling");
                         } else {
-                            const defaultLayout = Config.options.hyprland.defaultHyprlandLayout
-                            HyprlandSettings.setLayout(defaultLayout)
+                            const defaultLayout = Config.options.hyprland.defaultHyprlandLayout;
+                            HyprlandSettings.setLayout(defaultLayout);
                         }
                     }
-                    options: [ 
+                    options: [
                         {
                             displayName: Translation.tr("Default"),
                             icon: "mobile_layout",
                             value: "default"
-                        }, 
+                        },
                         {
                             displayName: Translation.tr("Scrolling"),
                             icon: "view_carousel",
@@ -426,7 +427,7 @@ ContentPage {
                         }
                     ]
                 }
-            }              
+            }
 
             ContentSubsection {
                 title: Translation.tr("Rounding style")
@@ -493,6 +494,60 @@ ContentPage {
                     copyPathButton.justCopied = false;
                 }
             }
+        }
+    }
+
+    Connections {
+        target: Config.options.appearance.palette
+        function onTypeChanged() { page.showRestartFab = true }
+    }
+
+    Connections {
+        target: Appearance.m3colors
+        function onDarkmodeChanged() { page.showRestartFab = true }
+    }
+
+    property bool showRestartFab: false
+
+    FloatingActionButton {
+        id: restartFab
+        parent: page.parent
+        anchors {
+            right: parent?.right
+            bottom: parent?.bottom
+            margins: 30
+        }
+        z: 100
+        iconText: "restart_alt"
+        buttonText: Translation.tr("Restart Shell")
+        expanded: false
+        visible: opacity > 0
+        opacity: page.showRestartFab ? 1 : 0
+        scale: opacity
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Appearance.animation.elementMoveFast.numberAnimation.duration
+                easing.type: Appearance.animation.elementMoveFast.numberAnimation.easing.type
+            }
+        }
+
+        colBackground: Appearance.colors.colTertiaryContainer
+        colBackgroundHover: Appearance.colors.colTertiaryContainerHover
+        colRipple: Appearance.colors.colTertiaryContainerActive
+        colOnBackground: Appearance.colors.colOnTertiaryContainer
+
+        onClicked: {
+            Quickshell.execDetached(["bash", "-c", "qs kill -c ii && qs -c ii &"]);
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.NoButton
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onEntered: restartFab.expanded = true
+            onExited: restartFab.expanded = false
         }
     }
 }

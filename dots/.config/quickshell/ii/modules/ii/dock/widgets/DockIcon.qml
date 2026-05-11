@@ -16,9 +16,15 @@ Item {
     IconImage {
         id: baseIcon
         anchors.fill: parent
-        source: Quickshell.iconPath(TaskbarApps.getCachedIcon(root.appId), "image-missing")
+        source: {
+            const _ = TaskbarApps.iconThemeRevision;
+            return Quickshell.iconPath(TaskbarApps.getCachedIcon(root.appId), "image-missing");
+        }
         visible: !Config.options.dock.monochromeIcons
         opacity: root.iconOpacity
+
+        // Force reload when icon theme regenerates (same pattern as DockFileButton)
+        backer.sourceSize: Qt.size(parent.width + TaskbarApps.iconThemeRevision, parent.height + TaskbarApps.iconThemeRevision)
 
         Behavior on opacity {
             animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)

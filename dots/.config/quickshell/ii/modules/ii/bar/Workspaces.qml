@@ -38,7 +38,7 @@ Item {
     property real iconRatio: 0.8
     property bool showIcons: Config.options.bar.workspaces.showAppIcons
 
-    readonly property bool isScrollingLayout: Persistent.states.hyprland.layout === "scrolling"
+    readonly property bool isScrollingLayout: Persistent.ready && Persistent.states.hyprland && Persistent.states.hyprland.layout === "scrolling"
     property int maxWindowCount: isScrollingLayout ? Config.options.bar.workspaces.maxWindowCount : 1
 
     readonly property bool dynamicWorkspaces: Config.options.bar.workspaces.dynamicWorkspaces
@@ -114,8 +114,7 @@ Item {
             windowsOnMonitor.sort((a, b) => a.at[0] - b.at[0]);
             root.monitorWindows = windowsOnMonitor.map(win => ({
                         icon: Quickshell.iconPath(AppSearch.guessIcon(win?.class), "image-missing"),
-                        workspace: win.workspace?.id,
-                        revision: TaskbarApps.iconThemeRevision // Add revision here for reactivity
+                        workspace: win.workspace?.id
                     }));
         }
     }
@@ -500,6 +499,14 @@ Item {
                             Layout.alignment: Qt.AlignHCenter
                             width: root.individualIconBoxHeight
                             height: root.individualIconBoxHeight
+                            MaterialShape {
+                                id: iconMask
+                                width: Math.max(1, mainAppIcon.width)
+                                height: Math.max(1, mainAppIcon.height)
+                                shapeString: Config.options.appearance.icons.shapeMask
+                                visible: false
+                            }
+
                             IconImage {
                                 id: mainAppIcon
                                 Layout.alignment: Qt.AlignHCenter
@@ -512,9 +519,6 @@ Item {
                                 source: modelData.icon
                                 implicitSize: (root.individualIconBoxHeight * root.iconRatio) * (root.showNumbersByMs ? 1 / 1.5 : 1)
 
-                                // Force reload when theme changes
-                                backer.sourceSize: Qt.size(implicitSize + (modelData.revision || 0), implicitSize + (modelData.revision || 0))
-
                                 Behavior on anchors.leftMargin {
                                     animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
                                 }
@@ -523,6 +527,30 @@ Item {
                                 }
                                 Behavior on implicitSize {
                                     animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
+                                }
+
+                                layer.enabled: Config.options.appearance.icons.enableShapeMask
+                                layer.effect: MultiEffect {
+                                    maskEnabled: true
+                                    maskSource: iconMask
+                                }
+                            }
+                            Loader {
+                                active: Config.options.bar.workspaces.monochromeIcons
+                                anchors.fill: mainAppIcon
+                                sourceComponent: Item {
+                                    Desaturate {
+                                        id: desaturatedIcon
+                                        visible: false
+                                        anchors.fill: parent
+                                        source: mainAppIcon
+                                        desaturation: 0.8
+                                    }
+                                    ColorOverlay {
+                                        anchors.fill: desaturatedIcon
+                                        source: desaturatedIcon
+                                        color: ColorUtils.transparentize(Appearance.colors.colOnLayer1, 0.9)
+                                    }
                                 }
                             }
                         }

@@ -97,8 +97,17 @@ RippleButton { // Right sidebar button
             Behavior on Layout.bottomMargin {
                 animation: Appearance.animation.elementMoveFast.numberAnimation.createObject(this)
             }
-            NotificationUnreadCount {
+            Loader {
                 id: notificationUnreadCount
+                sourceComponent: Config.options.bar.styles.notification === "expressive" ? expressiveNotificationComp : defaultNotificationComp
+            }
+            Component {
+                id: defaultNotificationComp
+                NotificationUnreadCount {}
+            }
+            Component {
+                id: expressiveNotificationComp
+                ExpressiveNotificationUnreadCount {}
             }
         }
         MaterialSymbol {

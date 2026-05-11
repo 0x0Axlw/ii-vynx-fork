@@ -23,7 +23,7 @@ import qs.modules.ii.background.widgets.media
 Variants {
     id: root
     model: Quickshell.screens
-    
+
     PanelWindow {
         id: bgRoot
 
@@ -74,8 +74,14 @@ Variants {
         readonly property bool isScrollingLayout: Persistent.states.hyprland.layout === "scrolling"
 
         property var zoomLevels: {  // has to be reverted compared to background
-            "in": { default: 1.04, zoomed: 1 },
-            "out": { default: 1, zoomed: 1.04 }
+            "in": {
+                default: 1.04,
+                zoomed: 1
+            },
+            "out": {
+                default: 1,
+                zoomed: 1.04
+            }
         }
 
         property real defaultRatio: zoomInStyle ? zoomLevels.in.default : zoomLevels.out.default
@@ -149,14 +155,14 @@ Variants {
         property bool mediaModeOpen: mediaModeLoader.active && MprisController.activePlayer
         onMediaModeOpenChanged: {
             if (!mediaModeOpen) {
-                Wallpapers.apply(Config.options.background.wallpaperPath)
-                LyricsService.shellColorChanged = false
+                Wallpapers.apply(Config.options.background.wallpaperPath);
+                LyricsService.shellColorChanged = false;
             }
         }
 
         Component.onCompleted: {
             if (!mediaModeOpen) {
-                Wallpapers.apply(Config.options.background.wallpaperPath)
+                Wallpapers.apply(Config.options.background.wallpaperPath);
             }
         }
 
@@ -166,9 +172,12 @@ Variants {
             clip: true
             scale: showOpeningAnimation && overviewOpen && bgRoot.isScrollingLayout ? zoomedRatio : defaultRatio
             opacity: mediaModeOpen ? 0 : 1
-            
+
             Behavior on opacity {
-                NumberAnimation { duration: 300; easing.type: Easing.InOutQuad }
+                NumberAnimation {
+                    duration: 300
+                    easing.type: Easing.InOutQuad
+                }
             }
 
             Behavior on scale {
@@ -189,14 +198,13 @@ Variants {
                     let result = 0.5;
                     if (Config.options.background.parallax.enableWorkspace && !bgRoot.verticalParallax) {
                         result = ((bgRoot.monitor.activeWorkspace?.id - lower) / range);
-
                     }
                     return result;
                 }
                 property real sidebarOffsetX: {
-                    if (!Config.options.background.parallax.enableSidebar) return 0;
+                    if (!Config.options.background.parallax.enableSidebar)
+                        return 0;
                     return (0.15 * GlobalStates.effectiveRightOpen - 0.15 * GlobalStates.effectiveLeftOpen);
-
                 }
                 property real valueY: {
                     let result = 0.5;
@@ -394,9 +402,9 @@ Variants {
                     onLoaded: {
                         if (item && item.requestReset) {
                             item.requestReset.connect(() => { // hard reset
-                                mediaLoader.enableLoading = false
-                                mediaTimer.running = true
-                            })
+                                mediaLoader.enableLoading = false;
+                                mediaTimer.running = true;
+                            });
                         }
                     }
                 }
@@ -408,12 +416,13 @@ Variants {
             description: "Toggles media mode on press"
 
             onPressed: {
-                if (!monitor.focused && Config.options.background.mediaMode.togglePerMonitor) return
-                mediaModeLoader.active = !mediaModeLoader.active
-                LyricsService.mediaModeOpenCount += mediaModeLoader.active ? 1 : -1
+                if (!monitor.focused && Config.options.background.mediaMode.togglePerMonitor)
+                    return;
+                mediaModeLoader.active = !mediaModeLoader.active;
+                LyricsService.mediaModeOpenCount += mediaModeLoader.active ? 1 : -1;
             }
         }
-        
+
         Loader {
             id: mediaModeLoader
             anchors.fill: parent

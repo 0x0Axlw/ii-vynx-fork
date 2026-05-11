@@ -87,7 +87,7 @@ ApplicationWindow {
     minimumHeight: 500
     width: 1100
     height: 750
-    color: Appearance.m3colors.m3background
+    color: Appearance.colors.colLayer0
 
     ColumnLayout {
         anchors {
@@ -353,7 +353,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 color: Appearance.m3colors.m3surfaceContainerLow
-                radius: Appearance.rounding.windowRounding - root.contentPadding
+                radius: Appearance.rounding.windowRounding 
 
                 Loader {
                     id: pageLoader

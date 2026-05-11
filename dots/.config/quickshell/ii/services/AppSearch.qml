@@ -20,6 +20,8 @@ Singleton {
         "wps": "wps-office2019-kprometheus",
         "wpsoffice": "wps-office2019-kprometheus",
         "footclient": "foot",
+        "org.prismlauncher.PrismLauncher": "prism_launcher",
+        "org.prismlauncher.prismlauncher": "prism_launcher",
     })
     property var regexSubstitutions: [
         {
@@ -98,6 +100,17 @@ Singleton {
     function guessIcon(str) {
         if (!str || str.length == 0) return "image-missing";
 
+        // If the string is already an absolute path, try its base name first
+        if (str.startsWith("/")) {
+            const base = str.split('/').pop().split('.')[0];
+            const lowerBase = base.toLowerCase();
+            if (iconExists(base)) return base;
+            if (iconExists(lowerBase)) return lowerBase;
+            // Also try substitutions
+            if (substitutions[base]) return substitutions[base];
+            if (substitutions[lowerBase]) return substitutions[lowerBase];
+        }
+
         // Quickshell's desktop entry lookup
         const entry = DesktopEntries.byId(str);
         if (entry) {
@@ -110,6 +123,13 @@ Singleton {
                 // Try lowercased
                 const lower = str.toLowerCase();
                 if (iconExists(lower)) return lower;
+
+                // Try stripping .desktop suffix
+                const strippedDesktop = str.replace(/\.desktop$/i, "");
+                if (iconExists(strippedDesktop)) return strippedDesktop;
+                
+                const strippedLower = strippedDesktop.toLowerCase();
+                if (iconExists(strippedLower)) return strippedLower;
 
                 // Try stripping path and extension from the absolute path
                 const base = icon.split('/').pop().split('.')[0];
@@ -168,6 +188,13 @@ Singleton {
         if (nameSearchResults.length > 0) {
             const guess = nameSearchResults[0].icon
             if (iconExists(guess)) return guess;
+
+            // Try the ID of the matched entry since absolute paths fail
+            const matchedId = nameSearchResults[0].id;
+            if (matchedId) {
+                const strippedMatchedId = matchedId.replace(/\.desktop$/i, "");
+                if (iconExists(strippedMatchedId)) return strippedMatchedId;
+            }
         }
 
         // Quickshell's desktop entry lookup

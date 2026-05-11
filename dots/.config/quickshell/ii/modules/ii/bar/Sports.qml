@@ -62,7 +62,12 @@ MouseArea {
             if (typeof rootItem !== "undefined") rootItem.toggleVisible(root.shouldBeVisible);
             // Only trigger switch animation if we are already visible and the game actually changed
             if (shouldBeVisible && displayGame !== SportsService.currentGame) {
-                switchAnim.restart();
+                if (displayGame && SportsService.currentGame && displayGame.id === SportsService.currentGame.id) {
+                    // Same game, data updated. Don't animate, just update the data model.
+                    displayGame = SportsService.currentGame;
+                } else {
+                    switchAnim.restart();
+                }
             }
         }
     }

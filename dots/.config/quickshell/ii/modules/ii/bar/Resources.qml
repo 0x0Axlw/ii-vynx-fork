@@ -6,53 +6,52 @@ import QtQuick.Layouts
 MouseArea {
     id: root
     property bool borderless: Config.options.bar.borderless
-    property bool alwaysShowAllResources: true //! FIXME: remove the alwaysShow properties, useless now
-    implicitWidth: rowLayout.implicitWidth + rowLayout.anchors.leftMargin + rowLayout.anchors.rightMargin
+    property bool vertical: false
+    implicitWidth: rowLayout.implicitWidth + 10
     implicitHeight: Appearance.sizes.barHeight
     hoverEnabled: !Config.options.bar.tooltips.clickToShow
 
     RowLayout {
         id: rowLayout
-
         spacing: 0
-        anchors.fill: parent
-        anchors.leftMargin: 4
-        anchors.rightMargin: 4
+        anchors.centerIn: parent
 
         Resource {
             iconName: "memory"
+            shown: Config.options.bar.resources.alwaysShowRam
             percentage: ResourceUsage.memoryUsedPercentage
             warningThreshold: Config.options.bar.resources.memoryWarningThreshold
         }
 
-//        Resource {
-//            iconName: "swap_horiz"
-//            percentage: ResourceUsage.swapUsedPercentage
-//            shown: (Config.options.bar.resources.alwaysShowSwap && percentage > 0) || 
-//                (MprisController.activePlayer?.trackTitle == null) ||
-//                root.alwaysShowAllResources
-//            Layout.leftMargin: shown ? 6 : 0
-//            warningThreshold: Config.options.bar.resources.swapWarningThreshold
-//        }
-
-        Resource {
-             iconName: "hard_drive"
-             percentage: ResourceUsage.diskUsedPercentage
-             shown: true
-             Layout.leftMargin: shown ? 6 : 0
-             warningThreshold: 90
-        }
-
         Resource {
             iconName: "planner_review"
+            shown: Config.options.bar.resources.alwaysShowCpu
             percentage: ResourceUsage.cpuUsage
-            shown: Config.options.bar.resources.alwaysShowCpu || 
-                !(MprisController.activePlayer?.trackTitle?.length > 0) ||
-                root.alwaysShowAllResources
             Layout.leftMargin: shown ? 6 : 0
             warningThreshold: Config.options.bar.resources.cpuWarningThreshold
         }
 
+        Resource {
+            iconName: "thermostat"
+            shown: Config.options.bar.resources.alwaysShowCpuTemp
+            percentage: ResourceUsage.cpuTemp / 100
+            Layout.leftMargin: shown ? 6 : 0
+        }
+
+        Resource {
+            iconName: "hard_drive"
+            shown: Config.options.bar.resources.alwaysShowDisk
+            percentage: ResourceUsage.diskUsedPercentage
+            Layout.leftMargin: shown ? 6 : 0
+        }
+
+        Resource {
+            iconName: "swap_horiz"
+            shown: Config.options.bar.resources.alwaysShowSwap
+            percentage: ResourceUsage.swapUsedPercentage
+            Layout.leftMargin: shown ? 6 : 0
+            warningThreshold: Config.options.bar.resources.swapWarningThreshold
+        }
     }
 
     ResourcesPopup {

@@ -14,6 +14,8 @@ ContentPage {
     property bool register: parent.register ?? false
     forceWidth: true
 
+    property bool showRestartFab: false
+
     ContentSection {
         icon: "keyboard"
         title: Translation.tr("Cheat sheet")
@@ -272,29 +274,7 @@ ContentPage {
             }
         }
 
-        ConfigRow {
-            uniform: true
-            ConfigSwitch {
-                buttonIcon: "colors"
-                text: Translation.tr("Tint app icons")
-                checked: Config.options.dock.monochromeIcons
-                onCheckedChanged: {
-                    Config.options.dock.monochromeIcons = checked;
-                }
-            }
-            ConfigSwitch {
-                buttonIcon: "contrast"
-                text: Translation.tr("Dim inactive app icons")
-                enabled: !Config.options.dock.monochromeIcons
-                checked: Config.options.dock.dimInactiveIcons
-                onCheckedChanged: {
-                    Config.options.dock.dimInactiveIcons = checked;
-                }
-                StyledToolTip {
-                    text: Translation.tr("Greyscale icons for pinned apps that are not running.\nDisabled when 'Tint app icons' is active.")
-                }
-            }
-        }
+
 
         ConfigSwitch {
             buttonIcon: "play_pause"
@@ -361,66 +341,142 @@ ContentPage {
         icon: "category"
         title: Translation.tr("Icons")
 
-        ContentSubsection {
-            title: Translation.tr("Base icon theme")
-            tooltip: Translation.tr("Select the base icon theme to be recolored by Matugen.\nRequires generating colors again to apply.")
-
-            ConfigSelectionArray {
-                currentValue: Config.options.appearance.iconTheme
-                onSelected: newValue => {
-                    Config.options.appearance.iconTheme = newValue;
-                }
-                options: IconThemes.availableThemes.map(theme => ({
-                            displayName: theme,
-                            value: theme,
-                            icon: "category"
-                        }))
+        ConfigSwitch {
+            buttonIcon: "magic_button"
+            text: Translation.tr("Themed icons (Experimental)")
+            checked: Config.options.appearance.icons.enableThemed
+            onCheckedChanged: {
+                Config.options.appearance.icons.enableThemed = checked;
+            }
+            StyledToolTip {
+                text: Translation.tr("When enabled, uses the dynamic Matugen generated icon pack. Fallbacks to Tint Icons.")
             }
         }
 
-        RowLayout {
+        ColumnLayout {
             Layout.fillWidth: true
-            Layout.topMargin: 10
-            spacing: 12
+            visible: Config.options.appearance.icons.enableThemed
 
-            Rectangle {
+            ContentSubsection {
+                title: Translation.tr("Base icon theme")
+                tooltip: Translation.tr("Select the base icon theme to be recolored by Matugen.\nRequires generating colors again to apply.")
+
+                ConfigSelectionArray {
+                    currentValue: Config.options.appearance.iconTheme
+                    onSelected: newValue => {
+                        Config.options.appearance.iconTheme = newValue;
+                    }
+                    options: IconThemes.availableThemes.map(theme => ({
+                                displayName: theme,
+                                value: theme,
+                                icon: "category"
+                            }))
+                }
+            }
+
+            RowLayout {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 50
-                radius: Appearance.rounding.large
-                color: Appearance.colors.colPrimary
+                Layout.topMargin: 10
+                spacing: 12
 
-                RippleButton {
-                    anchors.fill: parent
-                    onClicked: IconThemes.applyTheme()
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 50
+                    radius: Appearance.rounding.large
+                    color: Appearance.colors.colPrimary
 
-                    RowLayout {
-                        anchors.centerIn: parent
-                        spacing: 8
-                        MaterialSymbol {
-                            text: "magic_button"
-                            color: Appearance.m3colors.m3onPrimary
-                            iconSize: 24
+                    RippleButton {
+                        anchors.fill: parent
+                        onClicked: {
+                            IconThemes.applyTheme(false);
+                            page.showRestartFab = true;
                         }
-                        StyledText {
-                            text: Translation.tr("Apply Theme & Reload Shell")
-                            font.weight: Font.Bold
-                            font.pixelSize: Appearance.font.pixelSize.medium
-                            color: Appearance.m3colors.m3onPrimary
+
+                        RowLayout {
+                            anchors.centerIn: parent
+                            spacing: 8
+                            MaterialSymbol {
+                                text: "magic_button"
+                                color: Appearance.m3colors.m3onPrimary
+                                iconSize: 24
+                            }
+                            StyledText {
+                                text: Translation.tr("Apply Theme")
+                                font.weight: Font.Bold
+                                font.pixelSize: Appearance.font.pixelSize.medium
+                                color: Appearance.m3colors.m3onPrimary
+                            }
                         }
                     }
                 }
             }
-        }
 
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.topMargin: 4
-            StyledText {
-                text: Translation.tr("TemaDinamico will be generated from the selected base theme.")
-                color: Appearance.colors.colSubtext
-                font.pixelSize: Appearance.font.pixelSize.smallie
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 4
+                StyledText {
+                    text: Translation.tr("TemaDinamico will be generated from the selected base theme.")
+                    color: Appearance.colors.colSubtext
+                    font.pixelSize: Appearance.font.pixelSize.smallie
+                }
+            }
+
+            ConfigSwitch {
+                buttonIcon: "restart_alt"
+                text: Translation.tr("Automatically restart Quickshell on theme change")
+                checked: Config.options.appearance.wallpaperTheming.autoRestartQuickshell
+                onCheckedChanged: {
+                    Config.options.appearance.wallpaperTheming.autoRestartQuickshell = checked;
+                }
+                StyledToolTip {
+                    text: Translation.tr("Experimental: Automatically reloads the shell when the wallpaper or color scheme changes.")
+                }
             }
         }
+
+        ContentSubsection {
+            title: Translation.tr("Tint Icons (Fallback)")
+            tooltip: Translation.tr("Used when themed icons are disabled or as a fallback")
+            ConfigRow {
+                uniform: true
+                ConfigSwitch {
+                    buttonIcon: "colors"
+                    text: Translation.tr("Tint workspace icons")
+                    checked: Config.options.bar.workspaces.monochromeIcons
+                    onCheckedChanged: {
+                        Config.options.bar.workspaces.monochromeIcons = checked;
+                    }
+                    StyledToolTip {
+                        text: Translation.tr("Applies monochrome tint to workspace icons")
+                    }
+                }
+                ConfigSwitch {
+                    buttonIcon: "colors"
+                    text: Translation.tr("Tint dock icons")
+                    checked: Config.options.dock.monochromeIcons
+                    onCheckedChanged: {
+                        Config.options.dock.monochromeIcons = checked;
+                    }
+                    StyledToolTip {
+                        text: Translation.tr("Applies monochrome tint to dock icons")
+                    }
+                }
+            }
+            ConfigSwitch {
+                buttonIcon: "contrast"
+                text: Translation.tr("Dim inactive dock icons")
+                enabled: !Config.options.dock.monochromeIcons
+                checked: Config.options.dock.dimInactiveIcons
+                onCheckedChanged: {
+                    Config.options.dock.dimInactiveIcons = checked;
+                }
+                StyledToolTip {
+                    text: Translation.tr("Greyscale icons for pinned apps that are not running.\nDisabled when 'Tint dock icons' is active.")
+                }
+            }
+        }
+
+
     }
 
     ContentSection {
@@ -1331,4 +1387,57 @@ ContentPage {
             }
         }
     }
+
+    Connections {
+        target: Config.options.appearance.palette
+        function onTypeChanged() { page.showRestartFab = true }
+    }
+
+    Connections {
+        target: Appearance.m3colors
+        function onDarkmodeChanged() { page.showRestartFab = true }
+    }
+
+    FloatingActionButton {
+        id: restartFab
+        parent: page.parent
+        anchors {
+            right: parent?.right
+            bottom: parent?.bottom
+            margins: 30
+        }
+        z: 100
+        iconText: "restart_alt"
+        buttonText: Translation.tr("Restart Shell")
+        expanded: false
+        visible: opacity > 0
+        opacity: page.showRestartFab ? 1 : 0
+        scale: opacity
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Appearance.animation.elementMoveFast.numberAnimation.duration
+                easing.type: Appearance.animation.elementMoveFast.numberAnimation.easing.type
+            }
+        }
+
+        colBackground: Appearance.colors.colTertiaryContainer
+        colBackgroundHover: Appearance.colors.colTertiaryContainerHover
+        colRipple: Appearance.colors.colTertiaryContainerActive
+        colOnBackground: Appearance.colors.colOnTertiaryContainer
+
+        onClicked: {
+            Quickshell.execDetached(["bash", "-c", "qs kill -c ii && qs -c ii &"]);
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.NoButton
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onEntered: restartFab.expanded = true
+            onExited: restartFab.expanded = false
+        }
+    }
 }
+

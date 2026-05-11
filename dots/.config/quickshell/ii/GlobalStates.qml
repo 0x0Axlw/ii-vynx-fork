@@ -1,11 +1,11 @@
+pragma Singleton
+pragma ComponentBehavior: Bound
 import qs.modules.common
 import qs.services
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
-pragma Singleton
-pragma ComponentBehavior: Bound
 
 Singleton {
     id: root
@@ -70,30 +70,39 @@ Singleton {
 
     readonly property bool effectiveLeftOpen: {
         switch (Config.options.sidebar.position) {
-            case "default":  return policiesPanelOpen;  
-            case "inverted": return dashboardPanelOpen;  
-            case "left":     return dashboardPanelOpen || policiesPanelOpen;
-            case "right":    return false;
-            default:         return policiesPanelOpen;
+        case "default":
+            return policiesPanelOpen;
+        case "inverted":
+            return dashboardPanelOpen;
+        case "left":
+            return dashboardPanelOpen || policiesPanelOpen;
+        case "right":
+            return false;
+        default:
+            return policiesPanelOpen;
         }
     }
     readonly property bool effectiveRightOpen: {
         switch (Config.options.sidebar.position) {
-            case "default":  return dashboardPanelOpen; 
-            case "inverted": return policiesPanelOpen; 
-            case "left":     return false;
-            case "right":    return dashboardPanelOpen || policiesPanelOpen;
-            default:         return dashboardPanelOpen;
+        case "default":
+            return dashboardPanelOpen;
+        case "inverted":
+            return policiesPanelOpen;
+        case "left":
+            return false;
+        case "right":
+            return dashboardPanelOpen || policiesPanelOpen;
+        default:
+            return dashboardPanelOpen;
         }
     }
 
     onPoliciesPanelOpenChanged: {
         if (policiesPanelOpen) {
             if (Config.options.sidebar.position == "right" || Config.options.sidebar.position == "left") {
-                GlobalStates.dashboardPanelOpen = false
+                GlobalStates.dashboardPanelOpen = false;
             }
         }
-        
     }
 
     onDashboardPanelOpenChanged: {
@@ -101,20 +110,19 @@ Singleton {
             Notifications.timeoutAll();
             Notifications.markAllRead();
             if (Config.options.sidebar.position == "right" || Config.options.sidebar.position == "left") {
-                GlobalStates.policiesPanelOpen = false
+                GlobalStates.policiesPanelOpen = false;
             }
         }
-        
     }
 
     GlobalShortcut {
         name: "workspaceNumber"
         description: "Hold to show workspace numbers, release to show icons"
         onPressed: {
-            root.superDown = true
+            root.superDown = true;
         }
         onReleased: {
-            root.superDown = false
+            root.superDown = false;
         }
     }
 }

@@ -154,9 +154,19 @@ RippleButton {
         Component {
             id: iconImageComponent
             IconImage {
-                source: Quickshell.iconPath(root.iconName, "image-missing")
+                source: {
+                    const _ = TaskbarApps.iconThemeRevision;
+                    const searchStr = root.entry?.id || root.itemName || root.iconName;
+                    const guessed = AppSearch.guessIcon(searchStr);
+                    return Quickshell.iconPath(guessed, "image-missing");
+                }
                 width: 35
                 height: 35
+                // Force reload when icon theme regenerates
+                backer.sourceSize: Qt.size(
+                    35 + TaskbarApps.iconThemeRevision,
+                    35 + TaskbarApps.iconThemeRevision
+                )
             }
         }
 

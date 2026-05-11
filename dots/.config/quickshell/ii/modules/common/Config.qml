@@ -150,12 +150,18 @@ Singleton {
                     property bool enableAppsAndShell: true
                     property bool enableQtApps: true
                     property bool enableTerminal: true
+                    property bool autoRestartQuickshell: false
                     property JsonObject terminalGenerationProps: JsonObject {
                         property real harmony: 0.6
                         property real harmonizeThreshold: 100
                         property real termFgBoost: 0.35
                         property bool forceDarkMode: false
                     }
+                }
+                property JsonObject icons: JsonObject {
+                    property bool enableThemed: false
+                    property bool enableShapeMask: false
+                    property string shapeMask: "Circle"
                 }
                 property string iconTheme: "Papirus"
                 property JsonObject palette: JsonObject {
@@ -308,6 +314,25 @@ Singleton {
             }
 
             property JsonObject bar: JsonObject {
+                property bool borderless: false
+                property JsonObject styles: JsonObject {
+                    property string clock: "default" // default, expressive
+                    property string media: "default"
+                    property string notification: "default"
+                    property string utilButtons: "default"
+                    property string workspaces: "default"
+                    property string weather: "default"
+                    property string dashboard: "default"
+                    property string resources: "default"
+                    property string policies: "default"
+                    property string power: "default"
+                    property string battery: "default"
+                    property string systray: "default"
+                    property string bluetooth: "default"
+                    property string keyboard: "default"
+                    property string sports: "default"
+                }
+
                 property JsonObject activeWindow: JsonObject {
                     property bool fixedSize: false
                 }
@@ -351,6 +376,11 @@ Singleton {
 
                 property JsonObject resources: JsonObject {
                     property bool showPercentageText: true
+                    property bool alwaysShowRam: true
+                    property bool alwaysShowCpu: true
+                    property bool alwaysShowCpuTemp: false
+                    property bool alwaysShowDisk: false
+                    property bool alwaysShowSwap: false
                     property int memoryWarningThreshold: 95
                     property int swapWarningThreshold: 85
                     property int cpuWarningThreshold: 90
@@ -390,6 +420,8 @@ Singleton {
                     property bool showDarkModeToggle: true
                     property bool showPerformanceProfileToggle: false
                     property bool showScreenRecord: false
+                    property bool isRecording: false
+                    property bool showWallpaperToggle: true
                 }
                 property JsonObject workspaces: JsonObject {
                     property bool monochromeIcons: true

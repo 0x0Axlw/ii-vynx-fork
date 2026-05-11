@@ -147,8 +147,14 @@ StyledPopup {
                         visible: opacity > 0 || vIndex < gamesColumn.maxCards
                         Behavior on opacity { NumberAnimation { duration: 200 } }
                         Item {
-                            anchors.fill: parent
-                            anchors.margins: 20
+                            id: teamHeader
+                            width: parent.width
+                            height: 140
+                            anchors.top: parent.top
+
+                            Item {
+                                anchors.fill: parent
+                                anchors.margins: 20
 
                             // Home Team
                             Item {
@@ -291,6 +297,7 @@ StyledPopup {
                                 }
                             }
                         }
+                    }
 
                         Rectangle {
                             width: parent.width - 40
