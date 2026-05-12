@@ -67,6 +67,11 @@ ApplicationWindow {
             component: "modules/settings/AdvancedConfig.qml"
         },
         {
+            name: Translation.tr("Hyprland"),
+            icon: "wysiwyg",
+            component: "modules/settings/HyprlandConfig.qml"
+        },
+        {
             name: Translation.tr("About"),
             icon: "info",
             component: "modules/settings/About.qml"

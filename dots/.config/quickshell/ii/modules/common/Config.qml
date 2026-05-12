@@ -439,6 +439,8 @@ Singleton {
                     property bool useNerdFont: false
                     property int activeIndicatorOpacity: 100 // 0-100
                     property bool dynamicWorkspaces: false
+                    property bool useMaterialShapeForActiveIndicator: false
+                    property string activeIndicatorShape: "Circle"
                 }
                 property JsonObject weather: JsonObject {
                     property bool enable: false

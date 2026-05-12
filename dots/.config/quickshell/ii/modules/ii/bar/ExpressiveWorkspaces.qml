@@ -89,7 +89,11 @@ Item {
                         color: Appearance.colors.colPrimary
                         radius: Appearance.rounding.full
                         opacity: button.hovered ? 0.15 : 0
-                        Behavior on opacity { NumberAnimation { duration: 150 } }
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: 150
+                            }
+                        }
                     }
                     // Active workspace indicator
                     Rectangle {

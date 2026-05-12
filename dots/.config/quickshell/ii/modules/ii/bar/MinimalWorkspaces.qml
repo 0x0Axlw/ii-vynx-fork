@@ -64,20 +64,20 @@ Item {
     }
 
     // The animated highlight (pill)
-    Rectangle {
+    Loader {
         id: tabHighlight
         z: 1
         
-        AnimatedTabIndexPair {
-            id: idxPair
-            index: getWsIndex(activeWsId)
-        }
-
         readonly property real dotSize: 18
         readonly property real spacing: 6
         
         function getPosForIndex(i) {
             return i * (dotSize + spacing)
+        }
+        
+        AnimatedTabIndexPair {
+            id: idxPair
+            index: root.getWsIndex(activeWsId)
         }
         
         readonly property real animX1: getPosForIndex(idxPair.idx1)
@@ -88,9 +88,26 @@ Item {
         
         width: root.vertical ? dotSize : Math.abs(animX2 - animX1) + dotSize
         height: root.vertical ? Math.abs(animX2 - animX1) + dotSize : dotSize
-        
-        radius: Appearance.rounding.full
-        color: Appearance.colors.colPrimary
+
+        sourceComponent: Config.options.bar.workspaces.useMaterialShapeForActiveIndicator ? materialShapeComponent : rectangleComponent
+
+        Component {
+            id: rectangleComponent
+            Rectangle {
+                radius: Appearance.rounding.full
+                color: Appearance.colors.colPrimary
+                opacity: Config.options.bar.workspaces.activeIndicatorOpacity / 100
+            }
+        }
+
+        Component {
+            id: materialShapeComponent
+            MaterialShape {
+                shapeString: Config.options.bar.workspaces.activeIndicatorShape
+                color: Appearance.colors.colPrimary
+                opacity: Config.options.bar.workspaces.activeIndicatorOpacity / 100
+            }
+        }
     }
 
     GridLayout {

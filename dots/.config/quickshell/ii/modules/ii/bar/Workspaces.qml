@@ -158,18 +158,11 @@ Item {
     }
 
     // Active workspace indicator
-    Rectangle {
+    Loader {
+        id: activeIndicator
         z: 2
         anchors.horizontalCenter: root.vertical ? parent.horizontalCenter : undefined
         anchors.verticalCenter: root.vertical ? undefined : parent.verticalCenter
-        color: Appearance.colors.colPrimary
-        opacity: Config.options.bar.workspaces.activeIndicatorOpacity / 100
-        radius: Appearance.rounding.full
-
-        AnimatedTabIndexPair {
-            id: idxPair
-            index: root.visibleActiveIndex
-        }
 
         function offsetFor(index) {
             let y = 0;
@@ -205,6 +198,11 @@ Item {
             return indicatorInset;
         }
 
+        AnimatedTabIndexPair {
+            id: idxPair
+            index: root.visibleActiveIndex
+        }
+
         property real pairMin: Math.min(idxPair.idx1, idxPair.idx2)
         property real pairAbs: Math.abs(idxPair.idx1 - idxPair.idx2)
 
@@ -224,8 +222,28 @@ Item {
 
         y: root.vertical ? indicatorPosition : 0
         x: root.vertical ? 0 : indicatorPosition
-        implicitHeight: root.vertical ? indicatorLength : individualIconBoxHeight
-        implicitWidth: root.vertical ? individualIconBoxHeight : indicatorLength
+        width: root.vertical ? individualIconBoxHeight : indicatorLength
+        height: root.vertical ? indicatorLength : individualIconBoxHeight
+
+        sourceComponent: Config.options.bar.workspaces.useMaterialShapeForActiveIndicator ? materialShapeComponent : rectangleComponent
+
+        Component {
+            id: rectangleComponent
+            Rectangle {
+                radius: Appearance.rounding.full
+                color: Appearance.colors.colPrimary
+                opacity: Config.options.bar.workspaces.activeIndicatorOpacity / 100
+            }
+        }
+
+        Component {
+            id: materialShapeComponent
+            MaterialShape {
+                shapeString: Config.options.bar.workspaces.activeIndicatorShape
+                color: Appearance.colors.colPrimary
+                opacity: Config.options.bar.workspaces.activeIndicatorOpacity / 100
+            }
+        }
     }
 
     Rectangle { // NOTE: we still dont have an unhover animation

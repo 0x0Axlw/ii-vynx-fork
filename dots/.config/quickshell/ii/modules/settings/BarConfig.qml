@@ -1069,6 +1069,65 @@ ContentPage {
                 }
             }
         }
+
+        ContentSubsection {
+            title: Translation.tr("Active Indicator Shape")
+            tooltip: Translation.tr("Apply a Material Shape to the active workspace indicator")
+            ConfigRow {
+                ConfigSwitch {
+                    Layout.fillWidth: true
+                    buttonIcon: "frame_person"
+                    text: Translation.tr("Use Material Shape for indicator")
+                    checked: Config.options.bar.workspaces.useMaterialShapeForActiveIndicator
+                    onCheckedChanged: {
+                        Config.options.bar.workspaces.useMaterialShapeForActiveIndicator = checked;
+                    }
+                }
+
+                RippleButtonWithShape {
+                    Layout.fillWidth: false
+                    shapeString: Config.options.bar.workspaces.activeIndicatorShape
+                    implicitWidth: 60
+                    extraIcon: "edit"
+
+                    onClicked: {
+                        activeIndicatorShapeLoader.active = !activeIndicatorShapeLoader.active;
+                    }
+                    StyledToolTip {
+                        text: Translation.tr("Edit the material shape")
+                    }
+                }
+            }
+
+            Loader {
+                id: activeIndicatorShapeLoader
+                active: false
+                visible: active
+                Layout.fillWidth: true
+                sourceComponent: ContentSubsection {
+                    title: Translation.tr("Indicator shape")
+
+                    ConfigSelectionArray {
+                        currentValue: Config.options.bar.workspaces.activeIndicatorShape
+                        onSelected: newValue => {
+                            Config.options.bar.workspaces.activeIndicatorShape = newValue;
+                        }
+                        options: ([
+                            "Circle", "Square", "Slanted", "Arch", "Arrow", "SemiCircle", "Oval", "Pill", "Triangle",
+                            "Diamond", "ClamShell", "Pentagon", "Gem", "Sunny", "VerySunny", "Cookie4Sided", "Cookie6Sided",
+                            "Cookie7Sided", "Cookie9Sided", "Cookie12Sided", "Ghostish", "Clover4Leaf", "Clover8Leaf", "Burst",
+                            "SoftBurst", "Flower", "Puffy", "PuffyDiamond", "PixelCircle", "Bun", "Heart"
+                        ]).map(icon => {
+                            return {
+                                displayName: "",
+                                shape: icon,
+                                value: icon
+                            }
+                        })
+                    }
+                }
+            }
+        }
     }
 
     ContentSection {
