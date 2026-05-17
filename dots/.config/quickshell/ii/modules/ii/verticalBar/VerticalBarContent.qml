@@ -194,7 +194,7 @@ Item { // Bar content region
         }
 
         ColumnLayout { // Bottom items
-            spacing: 4
+            spacing: 8
             Repeater {
                 model: Config.options.bar.layouts.right
                 delegate: Bar.BarComponent {
@@ -329,7 +329,7 @@ Item { // Bar content region
             horizontalCenter: parent.horizontalCenter
             bottom: bottomStopper.top
         }
-        spacing: 4
+        spacing: 8
 
         Repeater {
             id: rightRepeater

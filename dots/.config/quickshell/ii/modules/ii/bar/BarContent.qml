@@ -294,7 +294,7 @@ Item { // Bar content region
         }
 
         RowLayout { // Right
-            spacing: 4
+            spacing: 8
             Repeater {
                 model: Config.options.bar.layouts.right
                 delegate: BarComponent {
@@ -384,7 +384,7 @@ Item { // Bar content region
             right: rightStopper.left
             rightMargin: 4
         }
-        spacing: 4
+        spacing: 8
 
         Repeater {
             id: rightRepeater

@@ -404,11 +404,15 @@ Item {
     }
     Component {
         id: powerComp
-        PowerButton {}
+        PowerButton {
+            vertical: rootItem.vertical
+        }
     }
     Component {
         id: powerCompExpressive
-        ExpressivePowerButton {}
+        ExpressivePowerButton {
+            vertical: rootItem.vertical
+        }
     }
     Component {
         id: batteryCompExpressive

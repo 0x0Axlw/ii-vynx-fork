@@ -239,6 +239,15 @@ MouseArea {
         ColumnLayout {
             spacing: 2
             Layout.alignment: Qt.AlignHCenter
+            StyledText {
+                Layout.alignment: Qt.AlignHCenter
+                text: root.displayGame ? root.displayGame.away.score : ""
+                font.pixelSize: 12
+                font.weight: Font.Black
+                color: Appearance.colors.colOnSurface
+                visible: root.displayGame ? root.displayGame.state !== "pre" : false
+                animateChange: true
+            }
             MaterialShape {
                 Layout.alignment: Qt.AlignHCenter
                 shapeString: "Cookie7Sided"
@@ -250,15 +259,6 @@ MouseArea {
                     height: parent.implicitSize - 12
                     source: root.displayGame ? root.displayGame.away.logo : ""
                 }
-            }
-            StyledText {
-                Layout.alignment: Qt.AlignHCenter
-                text: root.displayGame ? root.displayGame.away.score : ""
-                font.pixelSize: 12
-                font.weight: Font.Black
-                color: Appearance.colors.colOnSurface
-                visible: root.displayGame ? root.displayGame.state !== "pre" : false
-                animateChange: true
             }
         }
     }

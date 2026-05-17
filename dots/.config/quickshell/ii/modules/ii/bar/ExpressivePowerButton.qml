@@ -6,39 +6,29 @@ import qs.modules.common.widgets
 
 Item {
     id: root
-    property bool isMaterial: true // Forced expressive
+    property bool vertical: false
 
-    implicitWidth: loader.implicitWidth
-    implicitHeight: loader.implicitHeight
+    implicitWidth: vertical ? Appearance.sizes.verticalBarWidth - 8 : Appearance.sizes.barHeight - 8
+    implicitHeight: vertical ? Appearance.sizes.verticalBarWidth - 8 : Appearance.sizes.barHeight - 8
 
-    Loader {
-        id: loader
+    RippleButton {
         anchors.fill: parent
-        sourceComponent: materialStyle // Forced expressive
-    }
+        buttonRadius: Appearance.rounding.full
+        colBackground: Appearance.colors.colPrimary
+        colBackgroundHover: Appearance.colors.colPrimaryHover
+        colRipple: Appearance.colors.colPrimaryActive
+        onPressed: {
+            GlobalStates.sessionOpen = !GlobalStates.sessionOpen
+        }
 
-    Component {
-        id: materialStyle
-        RippleButton {
-            implicitWidth: Appearance.sizes.barHeight - 8
-            implicitHeight: Appearance.sizes.barHeight - 8
-            buttonRadius: Appearance.rounding.full
-            colBackground: Appearance.colors.colPrimary
-            colBackgroundHover: Appearance.colors.colPrimaryHover
-            colRipple: Appearance.colors.colPrimaryActive
-            onPressed: {
-                GlobalStates.sessionOpen = !GlobalStates.sessionOpen
-            }
-
-            MaterialShapeWrappedMaterialSymbol {
-                anchors.centerIn: parent
-                text: "power_settings_new"
-                iconSize: Appearance.font.pixelSize.normal
-                color: Appearance.colors.colOnPrimary
-                colSymbol: Appearance.colors.colPrimary
-                shape: MaterialShape.Shape.Cookie12Sided
-                padding: 2
-            }
+        MaterialShapeWrappedMaterialSymbol {
+            anchors.centerIn: parent
+            text: "power_settings_new"
+            iconSize: Appearance.font.pixelSize.normal
+            color: Appearance.colors.colOnPrimary
+            colSymbol: Appearance.colors.colPrimary
+            shape: MaterialShape.Shape.Cookie12Sided
+            padding: 2
         }
     }
 }

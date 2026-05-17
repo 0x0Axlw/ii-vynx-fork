@@ -132,7 +132,8 @@ ContentPage {
                         anchors.centerIn: parent
                         property string fileName: {
                             const path = Config.options.background.wallpaperPath;
-                            if (path === "") return "Click to select wallpaper";
+                            if (path === "")
+                                return "Click to select wallpaper";
                             const parts = path.split("/");
                             return parts[parts.length - 1];
                         }
@@ -470,6 +471,211 @@ ContentPage {
                             value: "verylarge"
                         }
                     ]
+                }
+            }
+        }
+    }
+
+    ContentSection {
+        icon: "style"
+        title: Translation.tr("Presets")
+        Layout.topMargin: -25
+        Layout.fillWidth: true
+
+        ListModel {
+            id: presetsModel
+        }
+
+        Process {
+            id: listPresetsProc
+            command: ["bash", "-c", `${Directories.scriptPath}/presets.sh list`]
+            onRunningChanged: {
+                if (running) {
+                    presetsModel.clear();
+                }
+            }
+            stdout: SplitParser {
+                onRead: data => {
+                    let str = data.trim();
+                    if (!str)
+                        return;
+                    try {
+                        let obj = JSON.parse(str);
+                        presetsModel.append(obj);
+                    } catch (e) {
+                        console.log("Failed to parse preset line:", e, str);
+                    }
+                }
+            }
+        }
+
+        Component.onCompleted: {
+            listPresetsProc.running = true;
+        }
+
+        ConfigRow {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 48
+
+            ToolbarTextField {
+                id: presetNameInput
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                placeholderText: Translation.tr("Preset name...")
+                font.pixelSize: Appearance.font.pixelSize.normal
+            }
+
+            RippleButtonWithIcon {
+                materialIcon: "save"
+                mainText: Translation.tr("Save")
+                buttonRadius: Appearance.rounding.small
+                Layout.fillHeight: true
+                enabled: presetNameInput.text.length > 0
+                onClicked: {
+                    Quickshell.execDetached(["bash", "-c", `${Directories.scriptPath}/presets.sh save "${presetNameInput.text}"`]);
+                    refreshTimer.restart();
+                    presetNameInput.text = "";
+                }
+            }
+        }
+
+        Timer {
+            id: refreshTimer
+            interval: 500
+            onTriggered: listPresetsProc.running = true
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.topMargin: 15
+            implicitHeight: flowLayout.implicitHeight
+            visible: presetsModel.count > 0
+
+            Flow {
+                id: flowLayout
+                anchors.left: parent.left
+                anchors.right: parent.right
+                spacing: 15
+
+                add: Transition {
+                    NumberAnimation {
+                        properties: "scale,opacity"
+                        from: 0
+                        to: 1
+                        duration: 200
+                        easing.type: Easing.OutBack
+                    }
+                }
+                move: Transition {
+                    NumberAnimation {
+                        properties: "x,y"
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+                }
+
+                Repeater {
+                    model: presetsModel
+
+                    delegate: Rectangle {
+                        id: presetItem
+                        width: Math.max(10, Math.floor((flowLayout.width - 30) / 3))
+                        height: width * 0.8
+                        radius: Appearance.rounding.normal
+                        color: Appearance.colors.colSurfaceContainerHigh
+                        border.color: presetButton.down ? Appearance.colors.colPrimaryActive : (presetButton.hovered ? Appearance.colors.colPrimary : "transparent")
+                        border.width: 2
+
+                        Behavior on border.color {
+                            ColorAnimation {
+                                duration: 150
+                            }
+                        }
+                        Behavior on scale {
+                            NumberAnimation {
+                                duration: 150
+                            }
+                        }
+                        scale: presetButton.down ? 0.95 : 1
+
+                        RippleButton {
+                            id: presetButton
+                            anchors.fill: parent
+                            buttonRadius: Appearance.rounding.normal
+                            colBackground: "transparent"
+                            colBackgroundHover: "transparent"
+                            colRipple: ColorUtils.transparentize(Appearance.colors.colPrimary, 0.8)
+                            onClicked: {
+                                Quickshell.execDetached(["bash", "-c", `${Directories.scriptPath}/presets.sh load "${model.name}"`]);
+                            }
+                        }
+
+                        ColumnLayout {
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            spacing: 10
+
+                            Item {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+
+                                StyledImage {
+                                    id: previewImage
+                                    anchors.fill: parent
+                                    source: model.wallpaper || `${Directories.assetsPath}/images/default_wallpaper.png`
+                                    fillMode: Image.PreserveAspectCrop
+                                    layer.enabled: true
+                                    layer.effect: OpacityMask {
+                                        maskSource: Rectangle {
+                                            width: previewImage.width
+                                            height: previewImage.height
+                                            radius: Appearance.rounding.small
+                                        }
+                                    }
+                                }
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                implicitHeight: 30
+
+                                StyledText {
+                                    anchors.left: parent.left
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.right: deleteButton.left
+                                    anchors.rightMargin: 10
+                                    text: model.name
+                                    color: Appearance.colors.colOnLayer1
+                                    font.pixelSize: Appearance.font.pixelSize.small
+                                    elide: Text.ElideRight
+                                }
+
+                                RippleButton {
+                                    id: deleteButton
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    implicitWidth: 30
+                                    implicitHeight: 30
+                                    buttonRadius: Appearance.rounding.full
+                                    colBackground: Appearance.colors.colError
+                                    colBackgroundHover: Appearance.colors.colErrorHover
+                                    colRipple: Appearance.colors.colErrorActive
+
+                                    contentItem: MaterialSymbol {
+                                        anchors.centerIn: parent
+                                        text: "delete"
+                                        iconSize: 16
+                                        color: Appearance.colors.colOnError
+                                    }
+
+                                    onClicked: {
+                                        Quickshell.execDetached(["bash", "-c", `${Directories.scriptPath}/presets.sh delete "${model.name}"`]);
+                                        refreshTimer.restart();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
