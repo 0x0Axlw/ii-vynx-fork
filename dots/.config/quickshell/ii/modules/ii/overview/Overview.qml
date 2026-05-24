@@ -96,6 +96,7 @@ Scope {
                             exitAnimTimer.restart();
                             searchWidget.disableExpandAnimation();
                             overviewScope.dontAutoCancelSearch = false;
+                            GlobalStates.searchOnlyMode = false;
                         } else {
                             root.exitAnimating = false;
                             exitAnimTimer.stop();
@@ -322,7 +323,7 @@ Scope {
                         anchors.horizontalCenter: parent.horizontalCenter
                         active: root.visible && (Config?.options.overview.enable ?? true) && !root.isScrollingLayout
 
-                        readonly property bool isOverviewVisible: GlobalStates.overviewOpen && (root.searchingText == "")
+                        readonly property bool isOverviewVisible: GlobalStates.overviewOpen && (root.searchingText == "") && !GlobalStates.searchOnlyMode
 
                         // Smooth slide, fade and scale when opening/closing or typing
                         opacity: isOverviewVisible ? 1.0 : 0.0
@@ -366,7 +367,7 @@ Scope {
                         anchors.fill: parent
                         active: root.visible && (Config?.options.overview.enable ?? true) && root.isScrollingLayout
 
-                        readonly property bool isOverviewVisible: GlobalStates.overviewOpen && (root.searchingText == "")
+                        readonly property bool isOverviewVisible: GlobalStates.overviewOpen && (root.searchingText == "") && !GlobalStates.searchOnlyMode
 
                         // Smooth slide, fade and scale when opening/closing or typing
                         opacity: isOverviewVisible ? 1.0 : 0.0
@@ -450,6 +451,14 @@ Scope {
         function clipboardToggle() {
             overviewScope.toggleClipboard();
         }
+        function searchOnlyToggle() {
+            if (GlobalStates.overviewOpen) {
+                GlobalStates.overviewOpen = false;
+            } else {
+                GlobalStates.searchOnlyMode = true;
+                GlobalStates.overviewOpen = true;
+            }
+        }
     }
 
     GlobalShortcut {
@@ -474,6 +483,19 @@ Scope {
 
         onPressed: {
             GlobalStates.overviewOpen = !GlobalStates.overviewOpen;
+        }
+    }
+    GlobalShortcut {
+        name: "searchOnlyToggle"
+        description: "Toggles search only mode on press"
+
+        onPressed: {
+            if (GlobalStates.overviewOpen) {
+                GlobalStates.overviewOpen = false;
+            } else {
+                GlobalStates.searchOnlyMode = true;
+                GlobalStates.overviewOpen = true;
+            }
         }
     }
     GlobalShortcut {

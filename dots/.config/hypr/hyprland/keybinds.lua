@@ -19,6 +19,7 @@ hl.bind("SUPER_R", hl.dsp.global("quickshell:workspaceNumber"), { ignore_mods = 
 hl.bind("SUPER_L", hl.dsp.global("quickshell:workspaceNumber"), { ignore_mods = true, transparent = true, release = true })
 hl.bind("SUPER_R", hl.dsp.global("quickshell:workspaceNumber"), { ignore_mods = true, transparent = true, release = true })
 hl.bind("SUPER + Tab", hl.dsp.global("quickshell:overviewWorkspacesToggle"), { description = "Shell: Toggle overview" })
+hl.bind("CTRL + Space", hl.dsp.global("quickshell:searchOnlyToggle"), { description = "Shell: Open search only" })
 hl.bind("SUPER + V", hl.dsp.global("quickshell:overviewClipboardToggle"))
 hl.bind("SUPER + Period", hl.dsp.global("quickshell:overviewEmojiToggle"))
 hl.bind("SUPER + A", hl.dsp.global("quickshell:sidebarLeftToggle"), { description = "Shell: Toggle left sidebar" })
@@ -28,7 +29,7 @@ hl.bind("SUPER + O", hl.dsp.global("quickshell:sidebarLeftToggle"))
 hl.bind("SUPER + N", hl.dsp.global("quickshell:sidebarRightToggle"), { description = "Shell: Toggle right sidebar" })
 hl.bind("SUPER + Slash", hl.dsp.global("quickshell:cheatsheetToggle"), { description = "Shell: Toggle cheatsheet" })
 hl.bind("SUPER + K", hl.dsp.global("quickshell:oskToggle"), { description = "Shell: Toggle on-screen keyboard" })
-hl.bind("SUPER + M", hl.dsp.global("quickshell:mediaControlsToggle"), { description = "Shell: Toggle media controls" })
+hl.bind("SUPER + M", hl.dsp.global("quickshell:ControlsToggle"), { description = "Shell: Toggle media controls" })
 hl.bind("SUPER + G", hl.dsp.global("quickshell:overlayToggle"), { description = "Shell: Toggle widget overlay" })
 hl.bind("CTRL + ALT + Delete", hl.dsp.global("quickshell:sessionToggle"), { description = "Shell: Toggle session menu" })
 hl.bind("SUPER + J", hl.dsp.global("quickshell:barToggle"), { description = "Shell: Toggle bar" })
@@ -178,9 +179,43 @@ for i = 1, 6 do
     hl.bind(keycombos[i], hl.dsp.window.move({ workspace = prefix[i] .. "1" })) -- # [hidden]
 end
 
-hl.bind("SUPER + ALT + S",
-    hl.dsp.window.move({ workspace = "special:special", follow = false }), {description = "Window: Send to scratchpad"})
+hl.bind("SUPER + ALT + S", function()
+    local ok, err = pcall(function()
+        local w = hl.get_active_window()
+        if not w then return end
+        
+        local is_special = false
+        if w.workspace and w.workspace.name then
+            if w.workspace.name:sub(1, 7) == "special" then
+                is_special = true
+            end
+        end
+        
+        if is_special then
+            local active_mon = hl.get_active_monitor()
+            local target_ws = nil
+            if active_mon and active_mon.activeWorkspace and active_mon.activeWorkspace.name then
+                target_ws = active_mon.activeWorkspace.name
+            else
+                local active_ws = hl.get_active_workspace()
+                if active_ws and active_ws.name and active_ws.name:sub(1, 7) ~= "special" then
+                    target_ws = active_ws.name
+                end
+            end
+            
+            if target_ws then
+                hl.dispatch(hl.dsp.window.move({ workspace = target_ws, follow = true }))
+            end
+        else
+            hl.dispatch(hl.dsp.window.move({ workspace = "special:special", follow = false }))
+        end
+    end)
+    if not ok then
+        os.execute("notify-send 'Scratchpad Error' '" .. tostring(err):gsub("'", "\\'") .. "'")
+    end
+end, {description = "Window: Toggle scratchpad"})
 hl.bind("CTRL + SUPER + S", hl.dsp.workspace.toggle_special("special"))
+
 
 --##! Workspace
 --# Switching
